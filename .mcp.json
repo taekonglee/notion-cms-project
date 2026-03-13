@@ -44,6 +44,15 @@
         "-y",
         "@modelcontextprotocol/server-memory"
       ]
+    },
+    "shrimp-task-manager": {
+      "command": "node",
+      "args": ["C:/Users/daum4/workspace/mcp-shrimp-task-manager/dist/index.js"],
+      "env": {
+        "DATA_DIR": "C:/Users/daum4/workspace/notion-cms-project/shrimp_data",
+        "TEMPLATES_USE": "en",
+        "ENABLE_GUI": "true"
+      }
     }
   }
 }
