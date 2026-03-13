@@ -1,0 +1,469 @@
+{
+  "tasks": [
+    {
+      "id": "136b75a1-050c-4caa-b5d1-399289d63f20",
+      "name": "[Phase 1-1] @notionhq/client 패키지 설치 및 환경변수 설정",
+      "description": "Notion API 연동을 위한 패키지 설치와 환경변수 템플릿을 준비한다.\n\n작업 내용:\n1. npm install @notionhq/client 실행\n2. .env.example에 NOTION_API_KEY, NOTION_DATABASE_ID 추가\n3. .gitignore에서 .env* 제외, .env.example 커밋 허용 여부 확인 (이미 설정됨, 확인만)\n4. .env.local 파일이 없으면 .env.example 복사하여 생성 안내 (파일 생성은 사용자가 직접)\n\n완료 기준(DoD):\n- package.json dependencies에 @notionhq/client 추가됨\n- .env.example에 두 환경변수 존재\n- npm run lint 오류 없음",
+      "notes": "package.json 변경 전 사용자에게 알림 필요. .env.local은 직접 생성하지 않는다. .gitignore는 이미 올바르게 설정되어 있음.",
+      "status": "pending",
+      "dependencies": [],
+      "createdAt": "2026-03-13T11:38:38.495Z",
+      "updatedAt": "2026-03-13T11:38:38.495Z",
+      "relatedFiles": [
+        {
+          "path": "package.json",
+          "type": "TO_MODIFY",
+          "description": "@notionhq/client 의존성 추가"
+        },
+        {
+          "path": ".env.example",
+          "type": "TO_MODIFY",
+          "description": "Notion 환경변수 템플릿 추가"
+        },
+        {
+          "path": ".gitignore",
+          "type": "REFERENCE",
+          "description": "환경변수 파일 제외 설정 확인"
+        }
+      ],
+      "implementationGuide": "1. Bash: npm install @notionhq/client\n2. Edit .env.example: NOTION_API_KEY=your_notion_integration_api_key 와 NOTION_DATABASE_ID=your_notion_database_id 추가\n3. Read .gitignore 확인 (.env* 제외, !.env.example 허용 이미 설정됨)\n4. Bash: npm run lint",
+      "verificationCriteria": "package.json에 @notionhq/client 존재, .env.example에 NOTION_API_KEY와 NOTION_DATABASE_ID 존재, npm run lint 오류 없음",
+      "analysisResult": "Notion CMS 블로그 프로젝트 (Next.js 16.1.6 App Router). ROADMAP.md Phase 1~5 순서 엄수. 기존 패턴: (dashboard) 라우트 그룹, components/layout/header|footer 재사용, cn() 유틸, shadcn/ui 18개 컴포넌트. 모든 Notion API 호출은 withRetry() 필수. 블로그 페이지 전체 revalidate=60 ISR 필수. og:image는 외부 URL만 허용."
+    },
+    {
+      "id": "b7830597-100d-45a7-a969-17868e40269e",
+      "name": "[Phase 1-2] (blog) 라우트 그룹 디렉토리 및 기본 파일 생성",
+      "description": "블로그 전용 라우트 그룹 app/(blog)/ 와 하위 페이지 파일을 생성한다.\n\n생성할 파일:\n- app/(blog)/layout.tsx: 블로그 공통 레이아웃 (Header + main + Footer)\n- app/(blog)/blog/page.tsx: /blog 글 목록 페이지 (빈 구조)\n- app/(blog)/blog/[slug]/page.tsx: /blog/[slug] 글 상세 페이지 (빈 구조)\n- app/(blog)/category/[category]/page.tsx: /category/[category] 카테고리 페이지 (빈 구조)\n\n라우트 그룹 규칙: (blog) 괄호는 URL에 영향 없음. /blog, /category/[category]가 실제 URL임.",
+      "notes": "Next.js 16에서 params는 Promise 타입. use(params) 또는 async/await로 unwrap 필요. (dashboard)/layout.tsx 패턴 참조하되 사이드바 없이 Header+Footer만 사용.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "136b75a1-050c-4caa-b5d1-399289d63f20"
+        }
+      ],
+      "createdAt": "2026-03-13T11:38:38.495Z",
+      "updatedAt": "2026-03-13T11:38:38.495Z",
+      "relatedFiles": [
+        {
+          "path": "app/(blog)/layout.tsx",
+          "type": "CREATE",
+          "description": "블로그 공통 레이아웃"
+        },
+        {
+          "path": "app/(blog)/blog/page.tsx",
+          "type": "CREATE",
+          "description": "글 목록 페이지 진입점"
+        },
+        {
+          "path": "app/(blog)/blog/[slug]/page.tsx",
+          "type": "CREATE",
+          "description": "글 상세 페이지 진입점"
+        },
+        {
+          "path": "app/(blog)/category/[category]/page.tsx",
+          "type": "CREATE",
+          "description": "카테고리 페이지 진입점"
+        },
+        {
+          "path": "app/(dashboard)/layout.tsx",
+          "type": "REFERENCE",
+          "description": "레이아웃 패턴 참조"
+        },
+        {
+          "path": "components/layout/header.tsx",
+          "type": "DEPENDENCY",
+          "description": "블로그 레이아웃에서 재사용"
+        },
+        {
+          "path": "components/layout/footer.tsx",
+          "type": "DEPENDENCY",
+          "description": "블로그 레이아웃에서 재사용"
+        }
+      ],
+      "implementationGuide": "app/(blog)/layout.tsx 구조:\n- Server Component (use client 없음)\n- import Header from components/layout/header\n- import Footer from components/layout/footer\n- return: div(flex flex-col min-h-screen) > Header + main(flex-1) {children} + Footer\n\napp/(blog)/blog/page.tsx:\n- export const revalidate = 60\n- export default function BlogListPage() { return <main>블로그 목록 준비 중</main> }\n\napp/(blog)/blog/[slug]/page.tsx:\n- export const revalidate = 60\n- export default function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) { return <main>글 상세 준비 중</main> }\n\napp/(blog)/category/[category]/page.tsx:\n- export const revalidate = 60\n- export default function CategoryPage({ params }: { params: Promise<{ category: string }> }) { return <main>카테고리 준비 중</main> }",
+      "verificationCriteria": "npm run dev 후 /blog 접근 시 200 응답, /category/test 접근 시 200 응답, /blog/any-slug 접근 시 200 응답, npm run lint 오류 없음",
+      "analysisResult": "Notion CMS 블로그 프로젝트 (Next.js 16.1.6 App Router). ROADMAP.md Phase 1~5 순서 엄수. 기존 패턴: (dashboard) 라우트 그룹, components/layout/header|footer 재사용, cn() 유틸, shadcn/ui 18개 컴포넌트. 모든 Notion API 호출은 withRetry() 필수. 블로그 페이지 전체 revalidate=60 ISR 필수. og:image는 외부 URL만 허용."
+    },
+    {
+      "id": "9d95f6c7-ed82-41c4-9403-47b2093765c0",
+      "name": "[Phase 2-1] TypeScript 타입 정의 (types/blog.ts)",
+      "description": "블로그 전체에서 사용할 TypeScript 타입을 정의한다. PRD 섹션 6 기반.\n\n정의할 타입:\n- BlogPost: id, title, category, tags, publishedAt, status, slug\n- NotionBlock: id, type(paragraph|heading_1|heading_2|heading_3|bulleted_list_item|numbered_list_item|code|image|quote|divider), content, children?\n- NotionRichText: plainText, href, annotations(bold,italic,strikethrough,underline,code)\n- NotionCodeBlock: language, richText\n- NotionImageBlock: type('external'|'file'), url, caption\n- FetchPostsOptions: pageSize?, startCursor?\n- FetchPostsResult: posts, hasMore, nextCursor?",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "b7830597-100d-45a7-a969-17868e40269e"
+        }
+      ],
+      "createdAt": "2026-03-13T11:38:38.495Z",
+      "updatedAt": "2026-03-13T11:38:38.495Z",
+      "relatedFiles": [
+        {
+          "path": "types/blog.ts",
+          "type": "CREATE",
+          "description": "블로그 TypeScript 타입 정의"
+        },
+        {
+          "path": "docs/PRD.md",
+          "type": "REFERENCE",
+          "description": "섹션 6 데이터 모델 참조"
+        }
+      ],
+      "implementationGuide": "types/blog.ts 생성:\n\nexport interface BlogPost {\n  id: string\n  title: string\n  category: string\n  tags: string[]\n  publishedAt: string\n  status: '초안' | '발행됨'\n  slug: string\n}\n\nexport interface NotionRichText {\n  plainText: string\n  href: string | null\n  annotations: { bold: boolean; italic: boolean; strikethrough: boolean; underline: boolean; code: boolean }\n}\n\nexport interface NotionCodeBlock {\n  language: string\n  richText: NotionRichText[]\n}\n\nexport interface NotionImageBlock {\n  type: 'external' | 'file'\n  url: string\n  caption: NotionRichText[]\n}\n\nexport type NotionBlockType = 'paragraph' | 'heading_1' | 'heading_2' | 'heading_3' | 'bulleted_list_item' | 'numbered_list_item' | 'code' | 'image' | 'quote' | 'divider'\n\nexport interface NotionBlock {\n  id: string\n  type: NotionBlockType\n  content: NotionRichText[] | NotionCodeBlock | NotionImageBlock | null\n  children?: NotionBlock[]\n}\n\nexport interface FetchPostsOptions {\n  pageSize?: number\n  startCursor?: string\n  category?: string\n}\n\nexport interface FetchPostsResult {\n  posts: BlogPost[]\n  hasMore: boolean\n  nextCursor?: string\n}",
+      "verificationCriteria": "types/blog.ts 생성됨, TypeScript 컴파일 오류 없음, npm run lint 통과",
+      "analysisResult": "Notion CMS 블로그 프로젝트 (Next.js 16.1.6 App Router). ROADMAP.md Phase 1~5 순서 엄수. 기존 패턴: (dashboard) 라우트 그룹, components/layout/header|footer 재사용, cn() 유틸, shadcn/ui 18개 컴포넌트. 모든 Notion API 호출은 withRetry() 필수. 블로그 페이지 전체 revalidate=60 ISR 필수. og:image는 외부 URL만 허용."
+    },
+    {
+      "id": "b8f770c4-a807-4a23-9af2-dafac300e909",
+      "name": "[Phase 2-2] Notion API 클라이언트 및 데이터 fetch 함수 구현",
+      "description": "lib/notion.ts와 lib/notion-api.ts를 구현한다.\n\nlib/notion.ts:\n- notionClient 싱글톤 (Client 인스턴스)\n- NOTION_DATABASE_ID 상수\n- withRetry<T>(fn, maxRetries=3): HTTP 429 시 Retry-After 헤더값 대기 후 재시도 [PRD m-02]\n\nlib/notion-api.ts:\n- fetchPublishedPosts(options?): FetchPostsResult — Status=발행됨 필터, has_more/next_cursor 페이지네이션 [PRD m-03]\n- fetchPageMetadata(pageId): BlogPost — pages.retrieve 1단계 [PRD M-01]\n- fetchPageBlocks(pageId): NotionBlock[] — blocks.children.list 2단계 + 재귀 + 페이지네이션 [PRD M-01, M-02]\n- fetchCategories(): string[] — DB 스키마 Category select 옵션 동적 수집\n- mapPageToBlogPost(page): BlogPost — Notion 응답 변환, Slug 필드 우선 후 title kebab-case 폴백 [PRD m-04]",
+      "notes": "모든 notionClient 직접 호출은 반드시 withRetry()로 감싼다. fetchCategories는 notionClient.databases.retrieve로 DB 스키마의 Category property select options를 추출한다. 환경변수는 서버 사이드에서만 접근.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "9d95f6c7-ed82-41c4-9403-47b2093765c0"
+        }
+      ],
+      "createdAt": "2026-03-13T11:38:38.495Z",
+      "updatedAt": "2026-03-13T11:38:38.495Z",
+      "relatedFiles": [
+        {
+          "path": "lib/notion.ts",
+          "type": "CREATE",
+          "description": "Notion 클라이언트 싱글톤 + withRetry"
+        },
+        {
+          "path": "lib/notion-api.ts",
+          "type": "CREATE",
+          "description": "데이터 fetch 함수 모음"
+        },
+        {
+          "path": "types/blog.ts",
+          "type": "DEPENDENCY",
+          "description": "BlogPost, NotionBlock 등 타입 참조"
+        },
+        {
+          "path": "lib/utils.ts",
+          "type": "REFERENCE",
+          "description": "cn() 패턴 참조"
+        },
+        {
+          "path": "docs/PRD.md",
+          "type": "REFERENCE",
+          "description": "M-01, M-02, m-02, m-03, m-04 이슈 구현 요구사항"
+        }
+      ],
+      "implementationGuide": "lib/notion.ts:\n  import { Client } from '@notionhq/client'\n  export const notionClient = new Client({ auth: process.env.NOTION_API_KEY })\n  export const NOTION_DATABASE_ID = process.env.NOTION_DATABASE_ID ?? ''\n  export async function withRetry<T>(fn: () => Promise<T>, maxRetries = 3): Promise<T> {\n    for attempt 0..maxRetries:\n      try: return await fn()\n      catch error:\n        if status===429 and attempt<maxRetries:\n          retryAfter = error.headers['retry-after'] ?? 1\n          await sleep(retryAfter * 1000)\n        else: throw error\n    throw new Error('최대 재시도 횟수 초과')\n  }\n\nlib/notion-api.ts:\n  fetchPublishedPosts(options):\n    withRetry(() => notionClient.databases.query({\n      database_id: NOTION_DATABASE_ID,\n      filter: { property: 'Status', select: { equals: '발행됨' } },\n      sorts: [{ property: 'Published', direction: 'descending' }],\n      page_size: options.pageSize ?? 10,\n      start_cursor: options.startCursor\n    }))\n    return { posts: results.map(mapPageToBlogPost), hasMore, nextCursor }\n\n  fetchPageBlocks(pageId) 재귀 구조:\n    allBlocks = []\n    cursor = undefined\n    do:\n      response = withRetry(() => notionClient.blocks.children.list({ block_id: pageId, start_cursor: cursor }))\n      for block in response.results:\n        mapped = mapBlock(block)\n        if block.has_children: mapped.children = await fetchPageBlocks(block.id)\n        allBlocks.push(mapped)\n      cursor = response.has_more ? response.next_cursor : null\n    while cursor\n    return allBlocks\n\n  mapPageToBlogPost(page):\n    slugField = props['Slug']?.rich_text?.[0]?.plain_text\n    slug = slugField || toSlug(title)\n    toSlug = title.toLowerCase().replace(/[^a-z0-9가-힣]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '')",
+      "verificationCriteria": "withRetry 함수에 HTTP 429 처리 로직 존재, fetchPublishedPosts/fetchPageMetadata/fetchPageBlocks/fetchCategories/mapPageToBlogPost 모두 export됨, TypeScript 오류 없음, npm run lint 통과",
+      "analysisResult": "Notion CMS 블로그 프로젝트 (Next.js 16.1.6 App Router). ROADMAP.md Phase 1~5 순서 엄수. 기존 패턴: (dashboard) 라우트 그룹, components/layout/header|footer 재사용, cn() 유틸, shadcn/ui 18개 컴포넌트. 모든 Notion API 호출은 withRetry() 필수. 블로그 페이지 전체 revalidate=60 ISR 필수. og:image는 외부 URL만 허용."
+    },
+    {
+      "id": "ed89b41d-3ad7-4bd8-bc1f-4fd58fbfc194",
+      "name": "[Phase 2-3] 블로그 UI 공통 컴포넌트 구현",
+      "description": "블로그 전반에서 재사용할 UI 컴포넌트 4개를 구현한다.\n\n- components/blog/post-card.tsx: 글 목록 카드 (제목, 카테고리 badge, 태그 badge 목록, 발행일)\n- components/blog/category-badge.tsx: 카테고리 단일 badge\n- components/blog/tag-badge.tsx: 태그 badge 목록\n- components/blog/post-skeleton.tsx: 로딩 상태 skeleton\n\n모두 Server Component. shadcn/ui badge, card, skeleton 재사용. cn() 필수 사용.",
+      "notes": "JSDoc @param @returns 필수. date-fns는 이미 설치됨 (package.json 확인). import { format, parseISO } from 'date-fns'. cn() import from '@/lib/utils'.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "b8f770c4-a807-4a23-9af2-dafac300e909"
+        }
+      ],
+      "createdAt": "2026-03-13T11:38:38.495Z",
+      "updatedAt": "2026-03-13T11:38:38.495Z",
+      "relatedFiles": [
+        {
+          "path": "components/blog/post-card.tsx",
+          "type": "CREATE",
+          "description": "글 목록 카드 컴포넌트"
+        },
+        {
+          "path": "components/blog/category-badge.tsx",
+          "type": "CREATE",
+          "description": "카테고리 badge 컴포넌트"
+        },
+        {
+          "path": "components/blog/tag-badge.tsx",
+          "type": "CREATE",
+          "description": "태그 badge 목록 컴포넌트"
+        },
+        {
+          "path": "components/blog/post-skeleton.tsx",
+          "type": "CREATE",
+          "description": "로딩 skeleton 컴포넌트"
+        },
+        {
+          "path": "types/blog.ts",
+          "type": "DEPENDENCY",
+          "description": "BlogPost 타입 참조"
+        },
+        {
+          "path": "components/ui/badge.tsx",
+          "type": "DEPENDENCY",
+          "description": "Badge 컴포넌트 재사용"
+        },
+        {
+          "path": "components/ui/card.tsx",
+          "type": "DEPENDENCY",
+          "description": "Card 컴포넌트 재사용"
+        },
+        {
+          "path": "components/ui/skeleton.tsx",
+          "type": "DEPENDENCY",
+          "description": "Skeleton 컴포넌트 재사용"
+        },
+        {
+          "path": "lib/utils.ts",
+          "type": "DEPENDENCY",
+          "description": "cn() 유틸 사용"
+        }
+      ],
+      "implementationGuide": "post-card.tsx:\n  props: { post: BlogPost }\n  shadcn Card > CardHeader(제목 + Link) + CardContent(CategoryBadge + TagBadgeList + 발행일)\n  date-fns format(parseISO(post.publishedAt), 'yyyy.MM.dd') 로 날짜 포맷\n  Link href={'/blog/' + post.slug}\n\ncategory-badge.tsx:\n  props: { category: string; className?: string }\n  shadcn Badge variant='secondary' 래핑\n\ntag-badge.tsx:\n  props: { tags: string[]; className?: string }\n  tags.map(tag => Badge variant='outline' key=tag)\n\npost-skeleton.tsx:\n  shadcn Skeleton으로 Card 구조 모방\n  제목 영역 h-6 w-3/4, 설명 h-4 w-full x2, badge 영역 h-5 w-20",
+      "verificationCriteria": "4개 컴포넌트 파일 생성됨, TypeScript 오류 없음, npm run lint 통과, Server Component 유지 ('use client' 없음)",
+      "analysisResult": "Notion CMS 블로그 프로젝트 (Next.js 16.1.6 App Router). ROADMAP.md Phase 1~5 순서 엄수. 기존 패턴: (dashboard) 라우트 그룹, components/layout/header|footer 재사용, cn() 유틸, shadcn/ui 18개 컴포넌트. 모든 Notion API 호출은 withRetry() 필수. 블로그 페이지 전체 revalidate=60 ISR 필수. og:image는 외부 URL만 허용."
+    },
+    {
+      "id": "96b1619b-8f11-4113-afa0-10304fe1fc5b",
+      "name": "[Phase 3-1] Notion 블록 렌더러 구현 (notion-renderer.tsx)",
+      "description": "Notion 블록을 React 컴포넌트로 렌더링하는 notion-renderer.tsx를 구현한다.\n\n지원 블록 타입 (PRD F002):\n- paragraph: p 태그, RichText 인라인 렌더링\n- heading_1/2/3: h1/h2/h3 태그\n- bulleted_list_item: ul > li\n- numbered_list_item: ol > li\n- code: shadcn ScrollArea + pre/code, 언어 표시\n- image: Next.js Image 컴포넌트, external/file 타입 구분 [PRD M-03]\n- quote: blockquote 스타일\n- divider: shadcn Separator\n- 미지원 블록: 플레인 텍스트 폴백 처리",
+      "notes": "image 블록에서 cover.type === 'file' 인 경우 렌더링하지 않는다 (외부 URL 정책 M-03). Next.js Image는 width, height 또는 fill 속성 필수. next.config.ts에 Notion 이미지 도메인 허용 설정 필요할 수 있음.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "ed89b41d-3ad7-4bd8-bc1f-4fd58fbfc194"
+        }
+      ],
+      "createdAt": "2026-03-13T11:38:38.495Z",
+      "updatedAt": "2026-03-13T11:38:38.495Z",
+      "relatedFiles": [
+        {
+          "path": "components/blog/notion-renderer.tsx",
+          "type": "CREATE",
+          "description": "Notion 블록 렌더러"
+        },
+        {
+          "path": "types/blog.ts",
+          "type": "DEPENDENCY",
+          "description": "NotionBlock, NotionRichText 타입"
+        },
+        {
+          "path": "components/ui/separator.tsx",
+          "type": "DEPENDENCY",
+          "description": "divider 블록 렌더링"
+        },
+        {
+          "path": "components/ui/scroll-area.tsx",
+          "type": "DEPENDENCY",
+          "description": "코드 블록 스크롤"
+        },
+        {
+          "path": "next.config.ts",
+          "type": "TO_MODIFY",
+          "description": "외부 이미지 도메인 허용 설정 추가"
+        }
+      ],
+      "implementationGuide": "components/blog/notion-renderer.tsx (Server Component):\n\nRichTextRenderer({ richText: NotionRichText[] }):\n  각 span에 annotations 조건부 적용\n  bold: font-bold, italic: italic, code: font-mono bg-muted px-1 rounded, strikethrough: line-through, underline: underline\n  href 있으면 a 태그로 감싸기\n\nNotionBlockRenderer({ block: NotionBlock }):\n  switch(block.type):\n    paragraph: <p><RichTextRenderer /></p>\n    heading_1: <h1 className='text-3xl font-bold'>\n    heading_2: <h2 className='text-2xl font-bold'>\n    heading_3: <h3 className='text-xl font-bold'>\n    bulleted_list_item: <li><RichTextRenderer /></li>\n    numbered_list_item: <li><RichTextRenderer /></li>\n    code: <ScrollArea><pre><code className={'language-' + lang}>{plainText}</code></pre></ScrollArea>\n    image: type==='external' ? <Image src={url} /> : null (file 타입 직접 사용 금지)\n    quote: <blockquote className='border-l-4 border-primary pl-4 italic'>\n    divider: <Separator />\n    default: <p>{plainText 폴백}</p>\n\nNotionRenderer({ blocks: NotionBlock[] }):\n  list/bulleted 연속 블록은 ul로 묶기\n  numbered 연속 블록은 ol로 묶기\n  block.children 있으면 재귀 렌더링",
+      "verificationCriteria": "8가지 블록 타입 렌더링 로직 존재, image 블록에서 file 타입 렌더링 없음, 미지원 블록 플레인 텍스트 폴백 존재, TypeScript 오류 없음, npm run lint 통과",
+      "analysisResult": "Notion CMS 블로그 프로젝트 (Next.js 16.1.6 App Router). ROADMAP.md Phase 1~5 순서 엄수. 기존 패턴: (dashboard) 라우트 그룹, components/layout/header|footer 재사용, cn() 유틸, shadcn/ui 18개 컴포넌트. 모든 Notion API 호출은 withRetry() 필수. 블로그 페이지 전체 revalidate=60 ISR 필수. og:image는 외부 URL만 허용."
+    },
+    {
+      "id": "4e71b0a6-b455-4015-aa76-90052b32dda9",
+      "name": "[Phase 3-2] 홈/목록/상세 페이지 구현 및 ISR 적용",
+      "description": "블로그 핵심 3개 페이지를 구현한다.\n\n1. app/page.tsx (홈): 최근 글 6개 카드 그리드, revalidate=60, 블로그 소개 헤더, '전체 글 보기' 버튼\n2. app/(blog)/blog/page.tsx (목록): 전체 발행 글 카드 그리드, revalidate=60, 빈 상태 UI\n3. app/(blog)/blog/[slug]/page.tsx (상세): generateStaticParams, 2단계 API 호출, notFound(), revalidate=60\n\n반응형: 모바일 1열(grid-cols-1), 태블릿 이상 2열(sm:grid-cols-2)",
+      "notes": "Next.js 16에서 params는 Promise. await params 필수. notFound()는 next/navigation에서 import. PostSkeleton은 Suspense fallback으로 사용 가능.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "96b1619b-8f11-4113-afa0-10304fe1fc5b"
+        }
+      ],
+      "createdAt": "2026-03-13T11:38:38.495Z",
+      "updatedAt": "2026-03-13T11:38:38.495Z",
+      "relatedFiles": [
+        {
+          "path": "app/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "홈 페이지 — 스타터킷 소개에서 블로그 홈으로 변환"
+        },
+        {
+          "path": "app/(blog)/blog/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "글 목록 페이지 구현"
+        },
+        {
+          "path": "app/(blog)/blog/[slug]/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "글 상세 페이지 구현"
+        },
+        {
+          "path": "components/blog/post-card.tsx",
+          "type": "DEPENDENCY",
+          "description": "카드 컴포넌트"
+        },
+        {
+          "path": "components/blog/post-skeleton.tsx",
+          "type": "DEPENDENCY",
+          "description": "로딩 skeleton"
+        },
+        {
+          "path": "components/blog/notion-renderer.tsx",
+          "type": "DEPENDENCY",
+          "description": "블록 렌더러"
+        },
+        {
+          "path": "lib/notion-api.ts",
+          "type": "DEPENDENCY",
+          "description": "fetch 함수"
+        },
+        {
+          "path": "components/ui/button.tsx",
+          "type": "DEPENDENCY",
+          "description": "CTA 버튼"
+        }
+      ],
+      "implementationGuide": "app/page.tsx:\n  export const revalidate = 60\n  async 서버 컴포넌트\n  const { posts } = await fetchPublishedPosts({ pageSize: 6 })\n  헤더 섹션 + PostCard 그리드(grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3) + '전체 글 보기' Button asChild Link href='/blog'\n\napp/(blog)/blog/page.tsx:\n  export const revalidate = 60\n  const { posts } = await fetchPublishedPosts({ pageSize: 100 })\n  posts.length === 0 ? 빈 상태 UI : PostCard 그리드(grid-cols-1 sm:grid-cols-2)\n\napp/(blog)/blog/[slug]/page.tsx:\n  export const revalidate = 60\n  export async function generateStaticParams():\n    const { posts } = await fetchPublishedPosts({ pageSize: 100 })\n    return posts.map(p => ({ slug: p.slug }))\n  async function Page({ params }: { params: Promise<{slug:string}> }):\n    const { slug } = await params\n    모든 posts에서 slug 매칭으로 pageId 찾기\n    if !found: notFound()\n    const post = await fetchPageMetadata(pageId)\n    const blocks = await fetchPageBlocks(pageId)\n    헤더(제목, CategoryBadge, TagBadge, 발행일) + NotionRenderer + 뒤로가기 버튼",
+      "verificationCriteria": "/ 접근 시 최근 글 6개 카드 표시, /blog 접근 시 전체 글 목록 표시, /blog/[slug] 접근 시 본문 블록 렌더링, 없는 slug 접근 시 404 반환, 모바일 375px 레이아웃 정상, npm run lint 통과",
+      "analysisResult": "Notion CMS 블로그 프로젝트 (Next.js 16.1.6 App Router). ROADMAP.md Phase 1~5 순서 엄수. 기존 패턴: (dashboard) 라우트 그룹, components/layout/header|footer 재사용, cn() 유틸, shadcn/ui 18개 컴포넌트. 모든 Notion API 호출은 withRetry() 필수. 블로그 페이지 전체 revalidate=60 ISR 필수. og:image는 외부 URL만 허용."
+    },
+    {
+      "id": "f99cb40f-883a-4fd2-8e50-22c8e60d6b41",
+      "name": "[Phase 4-1] 카테고리 페이지 및 검색/필터 컴포넌트 구현",
+      "description": "카테고리 전용 페이지와 블로그 목록 UX 완성을 위한 클라이언트 컴포넌트를 구현한다.\n\n1. app/(blog)/category/[category]/page.tsx: generateStaticParams(fetchCategories), revalidate=60, 카테고리 헤더, 글 카드 그리드, 빈 상태 UI\n2. components/blog/category-filter.tsx: 카테고리 탭 (전체 + 카테고리 목록), URL 쿼리 파라미터 기반 상태 관리 (Client Component)\n3. components/blog/search-input.tsx: 제목 기반 클라이언트 검색, debounce 300ms, 결과 없음 UI (Client Component)\n4. app/(blog)/blog/page.tsx 업데이트: CategoryFilter + SearchInput 통합",
+      "notes": "검색은 클라이언트 사이드 필터링 (page_size:100 전체 로드 전략 PRD m-01). category-filter와 search-input은 'use client' 필수. debounce는 별도 라이브러리 없이 setTimeout/clearTimeout으로 구현.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "4e71b0a6-b455-4015-aa76-90052b32dda9"
+        }
+      ],
+      "createdAt": "2026-03-13T11:38:38.495Z",
+      "updatedAt": "2026-03-13T11:38:38.495Z",
+      "relatedFiles": [
+        {
+          "path": "app/(blog)/category/[category]/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "카테고리 페이지 구현"
+        },
+        {
+          "path": "components/blog/category-filter.tsx",
+          "type": "CREATE",
+          "description": "카테고리 필터 탭 (Client)"
+        },
+        {
+          "path": "components/blog/search-input.tsx",
+          "type": "CREATE",
+          "description": "검색 입력 컴포넌트 (Client)"
+        },
+        {
+          "path": "app/(blog)/blog/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "필터/검색 컴포넌트 통합"
+        },
+        {
+          "path": "lib/notion-api.ts",
+          "type": "DEPENDENCY",
+          "description": "fetchCategories, fetchPublishedPosts"
+        },
+        {
+          "path": "types/blog.ts",
+          "type": "DEPENDENCY",
+          "description": "BlogPost 타입"
+        },
+        {
+          "path": "components/ui/input.tsx",
+          "type": "DEPENDENCY",
+          "description": "검색 input 컴포넌트"
+        }
+      ],
+      "implementationGuide": "category/[category]/page.tsx:\n  export const revalidate = 60\n  generateStaticParams: fetchCategories() → map to { category: cat }\n  Page: fetchPublishedPosts({ category: decodeURIComponent(params.category) })\n  카테고리명 헤더 + PostCard 그리드 + 빈 상태\n\ncategory-filter.tsx ('use client'):\n  props: { categories: string[]; currentCategory?: string }\n  useRouter, useSearchParams 사용\n  탭 클릭 시 router.push('?category=' + cat) 또는 router.push('/blog')\n\nsearch-input.tsx ('use client'):\n  props: { posts: BlogPost[]; onFilter: (filtered: BlogPost[]) => void }\n  useState(query), useEffect with setTimeout 300ms debounce\n  input onChange → debounce → posts.filter(title.includes(query)) → onFilter()\n  query 있고 결과 없으면 '검색 결과가 없습니다' 표시\n\nblog/page.tsx 업데이트:\n  fetchPublishedPosts({ pageSize: 100 }) 전체 로드\n  CategoryFilter + SearchInput 클라이언트 컴포넌트 추가\n  필터/검색 상태에 따라 표시할 posts 결정",
+      "verificationCriteria": "카테고리 탭 클릭 시 해당 카테고리 글만 표시, 검색어 입력 시 300ms 후 제목 기준 필터링, 결과 없음 UI 표시, /category/[category] 페이지 정상 렌더링, npm run lint 통과",
+      "analysisResult": "Notion CMS 블로그 프로젝트 (Next.js 16.1.6 App Router). ROADMAP.md Phase 1~5 순서 엄수. 기존 패턴: (dashboard) 라우트 그룹, components/layout/header|footer 재사용, cn() 유틸, shadcn/ui 18개 컴포넌트. 모든 Notion API 호출은 withRetry() 필수. 블로그 페이지 전체 revalidate=60 ISR 필수. og:image는 외부 URL만 허용."
+    },
+    {
+      "id": "d563c815-b212-4f24-987e-ab4210d203ef",
+      "name": "[Phase 4-2] SEO 메타데이터 적용 (generateMetadata)",
+      "description": "4개 페이지에 SEO 메타데이터를 적용한다. PRD F008 및 M-03 이슈 반영.\n\n1. app/page.tsx: 정적 metadata export\n2. app/(blog)/blog/page.tsx: 정적 metadata export\n3. app/(blog)/blog/[slug]/page.tsx: generateMetadata() — title, description(첫 단락), og:image(외부 URL만)\n4. app/(blog)/category/[category]/page.tsx: generateMetadata() — 카테고리명 포함 title\n\nog:image 정책: cover.type==='external'만 사용, file 타입 절대 금지 [PRD M-03]",
+      "notes": "BlogPost 타입에 cover 관련 필드 추가가 필요하므로 types/blog.ts와 lib/notion-api.ts의 mapPageToBlogPost를 함께 수정한다. Notion 내부 파일 URL(file 타입)은 og:image에 절대 사용 금지.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "f99cb40f-883a-4fd2-8e50-22c8e60d6b41"
+        }
+      ],
+      "createdAt": "2026-03-13T11:38:38.495Z",
+      "updatedAt": "2026-03-13T11:38:38.495Z",
+      "relatedFiles": [
+        {
+          "path": "app/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "정적 metadata 추가"
+        },
+        {
+          "path": "app/(blog)/blog/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "정적 metadata 추가"
+        },
+        {
+          "path": "app/(blog)/blog/[slug]/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "generateMetadata 구현"
+        },
+        {
+          "path": "app/(blog)/category/[category]/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "generateMetadata 구현"
+        },
+        {
+          "path": "types/blog.ts",
+          "type": "TO_MODIFY",
+          "description": "coverType, coverUrl 필드 추가"
+        },
+        {
+          "path": "lib/notion-api.ts",
+          "type": "TO_MODIFY",
+          "description": "mapPageToBlogPost에 cover 필드 추가"
+        }
+      ],
+      "implementationGuide": "app/page.tsx 정적 metadata:\n  export const metadata: Metadata = {\n    title: '개발 블로그',\n    description: 'Notion CMS 기반 개인 개발 블로그',\n    openGraph: { title: '개발 블로그', description: '...' }\n  }\n\nblog/[slug]/page.tsx generateMetadata:\n  export async function generateMetadata({ params }): Promise<Metadata>\n    slug로 post 메타데이터 조회\n    blocks 조회 후 첫 paragraph 블록의 plainText를 description으로\n    const ogImage = post.coverType === 'external' ? post.coverUrl : undefined\n    return { title: post.title, description, openGraph: { images: ogImage ? [ogImage] : [] } }\n\ncategory/[category]/page.tsx generateMetadata:\n  return { title: decodeURIComponent(params.category) + ' | 개발 블로그' }\n\nnote: BlogPost 타입에 coverType('external'|'file'|null), coverUrl(string|null) 필드 추가 필요 → types/blog.ts와 mapPageToBlogPost() 동시 수정",
+      "verificationCriteria": "브라우저 개발자 도구에서 각 페이지 title, description, og:image meta 태그 확인, og:image에 Notion 내부 URL 없음, TypeScript 오류 없음, npm run lint 통과",
+      "analysisResult": "Notion CMS 블로그 프로젝트 (Next.js 16.1.6 App Router). ROADMAP.md Phase 1~5 순서 엄수. 기존 패턴: (dashboard) 라우트 그룹, components/layout/header|footer 재사용, cn() 유틸, shadcn/ui 18개 컴포넌트. 모든 Notion API 호출은 withRetry() 필수. 블로그 페이지 전체 revalidate=60 ISR 필수. og:image는 외부 URL만 허용."
+    },
+    {
+      "id": "94eabd0d-34bc-469f-89b7-27289a4f4b9a",
+      "name": "[Phase 5-1] 성능 최적화, 반응형/다크모드 점검 및 배포 준비",
+      "description": "MVP 완성을 위한 최종 최적화와 배포 준비를 진행한다.\n\n1. Next.js Image 컴포넌트 적용 확인 (width/height 또는 fill 속성)\n2. LCP 대상 이미지에 priority 속성 추가 (홈 상단)\n3. 불필요한 Client Component → Server Component 전환 검토\n4. 모바일(375px), 태블릿(768px), 데스크탑(1280px) 반응형 최종 점검\n5. 다크모드 블로그 컴포넌트 색상 확인\n6. npm run build 오류 없음 확인\n7. next.config.ts에 외부 이미지 도메인 설정 최종 확인\n8. Vercel 배포를 위한 환경변수 목록 정리 (NOTION_API_KEY, NOTION_DATABASE_ID)",
+      "notes": "실제 Vercel 배포는 사용자가 직접 진행. 이 Task에서는 배포 준비 (빌드 확인, 환경변수 목록 정리)까지만 수행. Google PageSpeed 측정도 배포 후 사용자가 직접 진행.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "d563c815-b212-4f24-987e-ab4210d203ef"
+        }
+      ],
+      "createdAt": "2026-03-13T11:38:38.495Z",
+      "updatedAt": "2026-03-13T11:38:38.495Z",
+      "relatedFiles": [
+        {
+          "path": "next.config.ts",
+          "type": "TO_MODIFY",
+          "description": "이미지 도메인 remotePatterns 설정"
+        },
+        {
+          "path": "app/page.tsx",
+          "type": "REFERENCE",
+          "description": "홈 LCP 이미지 priority 확인"
+        },
+        {
+          "path": "components/blog/notion-renderer.tsx",
+          "type": "REFERENCE",
+          "description": "다크모드 스타일 확인"
+        },
+        {
+          "path": "components/blog/post-card.tsx",
+          "type": "REFERENCE",
+          "description": "다크모드 스타일 확인"
+        }
+      ],
+      "implementationGuide": "next.config.ts 확인/수정:\n  images.remotePatterns에 notion 이미지 도메인 추가:\n  { protocol: 'https', hostname: '**.notion.so' }\n  { protocol: 'https', hostname: 'images.unsplash.com' } 등\n\nnpm run build 실행 후 오류 점검:\n  - 정적 생성 실패 시 generateStaticParams 확인\n  - 타입 오류 수정\n  - lint 오류 수정\n\n반응형 점검 체크리스트:\n  - 375px: 1열 그리드, 폰트 가독성, 터치 버튼 크기\n  - 768px: 2열 그리드 전환 확인\n  - 1280px: 최대 너비 컨테이너 확인\n\n다크모드 점검:\n  - PostCard, CategoryBadge, TagBadge 다크모드 색상\n  - NotionRenderer 코드 블록, 인용구 다크모드\n  - 이미지 밝기 필터 검토",
+      "verificationCriteria": "npm run build 오류 없음, next.config.ts 이미지 도메인 설정 완료, 모바일 375px 레이아웃 정상, 다크모드 전환 시 블로그 컴포넌트 색상 정상, npm run lint 통과",
+      "analysisResult": "Notion CMS 블로그 프로젝트 (Next.js 16.1.6 App Router). ROADMAP.md Phase 1~5 순서 엄수. 기존 패턴: (dashboard) 라우트 그룹, components/layout/header|footer 재사용, cn() 유틸, shadcn/ui 18개 컴포넌트. 모든 Notion API 호출은 withRetry() 필수. 블로그 페이지 전체 revalidate=60 ISR 필수. og:image는 외부 URL만 허용."
+    }
+  ]
+}
