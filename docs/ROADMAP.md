@@ -34,11 +34,11 @@ Phase 5     최적화 및 배포                            13~14일차
 
 ### 세부 작업
 
-- [ ] `@notionhq/client` 패키지 설치
+- [x] `@notionhq/client` 패키지 설치
   ```bash
   npm install @notionhq/client
   ```
-- [ ] `.env.example`에 Notion 환경변수 추가
+- [x] `.env.example`에 Notion 환경변수 추가
   ```bash
   NOTION_API_KEY=your_notion_integration_api_key
   NOTION_DATABASE_ID=your_notion_database_id
@@ -48,7 +48,7 @@ Phase 5     최적화 및 배포                            13~14일차
 - [ ] Notion DB 커버 이미지 **외부 URL** 설정 정책 수립 — [PRD M-03]
   - GitHub raw, Cloudinary, Unsplash 등 만료 없는 외부 URL 사용
   - Notion 내부 파일 URL(`cover.type === "file"`) 직접 사용 금지
-- [ ] `app/(blog)/` 라우트 그룹 디렉토리 생성
+- [x] `app/(blog)/` 라우트 그룹 디렉토리 생성
   ```
   app/
     (blog)/
@@ -61,16 +61,16 @@ Phase 5     최적화 및 배포                            13~14일차
         [category]/
           page.tsx        # /category/[category] — 카테고리 페이지 (빈 파일)
   ```
-- [ ] `app/page.tsx` 홈 페이지 기본 구조 확인 (기존 파일 활용)
+- [x] `app/page.tsx` 홈 페이지 기본 구조 확인 (기존 파일 활용)
 
 #### 테스트 — 라우트 구조 접근 확인 (세부 작업 완료 후)
 
 > 사용 도구: `mcp__playwright__browser_navigate`, `mcp__playwright__browser_snapshot`
 
-- [ ] **시나리오 1**: `http://localhost:3000/blog` 접근 → 404가 아닌 페이지 반환 확인
+- [x] **시나리오 1**: `http://localhost:3000/blog` 접근 → 404가 아닌 페이지 반환 확인
   - `browser_navigate` → `/blog`
   - `browser_snapshot` → 페이지 접근성 트리에서 404 에러 텍스트 미존재 확인
-- [ ] **시나리오 2**: `http://localhost:3000/category/test` 접근 → 404가 아닌 페이지 반환 확인
+- [x] **시나리오 2**: `http://localhost:3000/category/test` 접근 → 404가 아닌 페이지 반환 확인
   - `browser_navigate` → `/category/test`
   - `browser_snapshot` → 페이지 접근성 트리에서 404 에러 텍스트 미존재 확인
 
