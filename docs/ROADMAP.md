@@ -103,12 +103,12 @@ Phase 5     최적화 및 배포                            13~14일차
 
 #### Notion 클라이언트 및 API 래퍼
 
-- [ ] `lib/notion.ts` — Notion 클라이언트 싱글톤 + `withRetry()` 구현 — [PRD m-02]
+- [x] `lib/notion.ts` — Notion 클라이언트 싱글톤 + `withRetry()` 구현 — [PRD m-02]
   ```typescript
   // HTTP 429 응답 시 Retry-After 헤더 값만큼 대기 후 재시도 (최대 3회)
   export async function withRetry<T>(fn: () => Promise<T>): Promise<T>
   ```
-- [ ] `lib/notion-api.ts` — 데이터 fetch 함수 구현
+- [x] `lib/notion-api.ts` — 데이터 fetch 함수 구현
   - `fetchPublishedPosts(options?)` — `Status=발행됨` 필터 + `has_more`/`next_cursor` 페이지네이션 — [PRD m-03]
   - `fetchPageMetadata(pageId)` — 1단계: 페이지 속성(메타데이터)만 조회 — [PRD M-01]
   - `fetchPageBlocks(pageId)` — 2단계: 블록 별도 조회 + 중첩 블록 재귀 처리 — [PRD M-01, M-02]
@@ -117,7 +117,7 @@ Phase 5     최적화 및 배포                            13~14일차
 
 #### TypeScript 타입 정의
 
-- [ ] `types/blog.ts` — PRD 섹션 6 기반 타입 정의
+- [x] `types/blog.ts` — PRD 섹션 6 기반 타입 정의
   - `BlogPost` — 글 메타데이터 타입
   - `NotionBlock` — 블록 렌더링 타입
   - `NotionRichText` — 리치 텍스트 타입
@@ -126,10 +126,10 @@ Phase 5     최적화 및 배포                            13~14일차
 
 #### 블로그 UI 컴포넌트
 
-- [ ] `components/blog/post-card.tsx` — 글 목록 카드 (제목, 카테고리 badge, 태그 badge, 발행일)
-- [ ] `components/blog/category-badge.tsx` — 카테고리 badge (shadcn `badge` 래핑)
-- [ ] `components/blog/tag-badge.tsx` — 태그 badge 목록 (shadcn `badge` 래핑)
-- [ ] `components/blog/post-skeleton.tsx` — 로딩 상태 플레이스홀더 (shadcn `skeleton` 활용)
+- [x] `components/blog/post-card.tsx` — 글 목록 카드 (제목, 카테고리 badge, 태그 badge, 발행일)
+- [x] `components/blog/category-badge.tsx` — 카테고리 badge (shadcn `badge` 래핑)
+- [x] `components/blog/tag-badge.tsx` — 태그 badge 목록 (shadcn `badge` 래핑)
+- [x] `components/blog/post-skeleton.tsx` — 로딩 상태 플레이스홀더 (shadcn `skeleton` 활용)
 
 #### 테스트 ① — Notion API 연결 및 데이터 fetch 확인 (`lib/notion-api.ts` 구현 완료 후)
 
@@ -156,7 +156,7 @@ Phase 5     최적화 및 배포                            13~14일차
   - `browser_snapshot` → 카드 내 제목(`heading`), 카테고리 badge, 발행일 텍스트 요소 존재 확인
 - [ ] **시나리오 2**: PostSkeleton — 로딩 상태 skeleton 요소 확인
   - `browser_evaluate` → 페이지 로딩 지연 시뮬레이션 후 skeleton 클래스 요소 존재 확인
-- [ ] **시나리오 3**: 다크모드 — PostCard 테마 색상 스크린샷 비교
+- [x] **시나리오 3**: 다크모드 — PostCard 테마 색상 스크린샷 비교
   - `browser_evaluate` → `document.documentElement.classList.add('dark')` 실행
   - `browser_take_screenshot` → 다크모드 카드 스크린샷 저장 후 배경/텍스트 색상 시각 확인
 
@@ -518,10 +518,10 @@ Phase 5     최적화 및 배포                            13~14일차
 
 | 이슈 ID | 등급 | 내용 | 반영 Phase | 완료 |
 |---------|------|------|-----------|------|
-| M-01 | Major | F002: 2단계 API 호출 구조 (pages API + blocks API 분리) | Phase 2, 3 | ☐ |
-| M-02 | Major | F002: 중첩 블록 재귀 처리 및 블록 페이지네이션 구현 | Phase 2, 3 | ☐ |
+| M-01 | Major | F002: 2단계 API 호출 구조 (pages API + blocks API 분리) | Phase 2, 3 | ☑ (Phase 2 코드 완료, Phase 3 페이지 연동 미완) |
+| M-02 | Major | F002: 중첩 블록 재귀 처리 및 블록 페이지네이션 구현 | Phase 2, 3 | ☑ (Phase 2 코드 완료, Phase 3 페이지 연동 미완) |
 | M-03 | Major | F008: Notion 내부 이미지 URL 직접 사용 금지, 외부 URL 정책 | Phase 1, 3, 4 | ☐ |
 | m-01 | Minor | F004: 클라이언트 검색 전체 로드(`page_size: 100`) 전략 | Phase 4 | ☐ |
-| m-02 | Minor | F007: `withRetry()` Rate Limit(초당 3회, 최대 3회 재시도) 구현 | Phase 2 | ☐ |
-| m-03 | Minor | F001·F003: `has_more`/`next_cursor` 페이지네이션 처리 | Phase 2 | ☐ |
-| m-04 | Minor | 전반: Notion DB `Slug` (rich_text) 필드 추가, 폴백 로직 구현 | Phase 1, 2 | ☐ |
+| m-02 | Minor | F007: `withRetry()` Rate Limit(초당 3회, 최대 3회 재시도) 구현 | Phase 2 | ☑ 완료 |
+| m-03 | Minor | F001·F003: `has_more`/`next_cursor` 페이지네이션 처리 | Phase 2 | ☑ 완료 |
+| m-04 | Minor | 전반: Notion DB `Slug` (rich_text) 필드 추가, 폴백 로직 구현 | Phase 1, 2 | ☑ (폴백 로직 완료, Notion DB 필드 추가는 수동 작업) |
