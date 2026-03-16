@@ -205,6 +205,240 @@
       "analysisResult": "Phase 2 공통 모듈 구현 — Next.js 16 App Router + @notionhq/client v5.13.0 + shadcn/ui 기반 Notion CMS 블로그. 모든 파일은 TypeScript로 작성하며, camelCase 함수명, kebab-case 파일명, JSDoc 한국어 주석, @/* path alias를 사용한다. console.log 대신 에러는 throw로 처리. 의존성 순서: types → lib → components.",
       "summary": "post-card.tsx 생성 완료. Link→Card(data-testid=\"post-card\")→CardHeader(CategoryBadge)+CardContent(제목 line-clamp-2)+CardFooter(TagBadge+date-fns 날짜 포맷) 구조. hover 스타일(-translate-y-0.5, shadow-md, text-primary) 적용. publishedAt 빈 문자열 조건부 처리 포함. npm run build 오류 없음.",
       "completedAt": "2026-03-16T06:51:42.840Z"
+    },
+    {
+      "id": "c18e402d-f555-418b-8526-0490f2eac74a",
+      "name": "next.config.ts — 이미지 도메인 remotePatterns 설정",
+      "description": "Next.js Image 컴포넌트가 외부 이미지를 렌더링할 수 있도록 next.config.ts에 images.remotePatterns를 추가한다. Notion 본문의 이미지 블록(external/file 타입 모두)과 외부 커버 이미지(Unsplash, GitHub raw 등)를 Next.js Image로 표시하기 위해 필요하다.",
+      "notes": "Notion 내부 파일 URL은 PRD M-03에 의해 OG 이미지로는 사용 금지지만, 본문 블록 렌더링 시 Next.js Image 표시는 허용됨. 와일드카드 hostname 대신 명시적 도메인 나열 권장(보안).",
+      "status": "completed",
+      "dependencies": [],
+      "createdAt": "2026-03-16T07:05:26.937Z",
+      "updatedAt": "2026-03-16T07:13:20.358Z",
+      "relatedFiles": [
+        {
+          "path": "next.config.ts",
+          "type": "TO_MODIFY",
+          "description": "Next.js 설정 파일 — images.remotePatterns 추가"
+        }
+      ],
+      "implementationGuide": "next.config.ts 수정:\n1. NextConfig에 images.remotePatterns 배열 추가\n2. 포함할 도메인:\n   - hostname: 'prod-files-secure.s3.us-west-2.amazonaws.com' (Notion 내부 파일)\n   - hostname: 'www.notion.so'\n   - hostname: 'images.unsplash.com'\n   - hostname: 'raw.githubusercontent.com'\n   - hostname: '*.amazonaws.com' (와일드카드)\n3. 각 항목에 protocol: 'https' 명시\n\npseudocode:\nconst nextConfig: NextConfig = {\n  images: {\n    remotePatterns: [\n      { protocol: 'https', hostname: 'prod-files-secure.s3.us-west-2.amazonaws.com' },\n      { protocol: 'https', hostname: 'www.notion.so' },\n      { protocol: 'https', hostname: 'images.unsplash.com' },\n      { protocol: 'https', hostname: 'raw.githubusercontent.com' },\n    ]\n  }\n}",
+      "verificationCriteria": "npm run build 시 이미지 도메인 관련 경고 없음. next.config.ts에 images.remotePatterns 배열이 존재하고 최소 3개 이상 도메인 포함.",
+      "analysisResult": "Phase 3 핵심 기능 구현: @notionhq/client v5.13.0(dataSources.query API 확인 완료), Phase 2 공통 모듈 전부 완료 상태에서 홈 페이지, 블로그 목록 페이지, Notion 블록 렌더러, 글 상세 페이지를 구현한다. 기술 스택: Next.js 16 App Router, Tailwind CSS v4, shadcn/ui, TypeScript. 코딩 규칙: camelCase 변수/함수, PascalCase 컴포넌트, kebab-case 파일명, JSDoc 주석 필수, console.log 금지, 에러 catch 후 처리. Server Component 우선 원칙. path alias @/* 사용.",
+      "summary": "next.config.ts images.remotePatterns에 5개 도메인 등록 완료: Unsplash, GitHub raw, Cloudinary, www.notion.so, prod-files-secure.s3.us-west-2.amazonaws.com. external 이미지는 Next.js Image, file 타입은 notion-renderer에서 img 폴백(PRD M-03). lint 통과.",
+      "completedAt": "2026-03-16T07:13:20.356Z"
+    },
+    {
+      "id": "d65f66e3-78da-4fb6-87d0-a9efc457b545",
+      "name": "components/layout/header.tsx — 블로그 네비게이션 링크 추가",
+      "description": "현재 header.tsx의 데스크탑 네비게이션에 '홈', '대시보드' 링크만 있는 것을 PRD 섹션 4에 맞게 '홈', '블로그', '카테고리' 링크로 교체한다. 모바일 MobileNav도 동일하게 업데이트가 필요할 수 있으나, MobileNav는 Sidebar를 재사용하므로 Sidebar 컴포넌트의 navItems를 확인 후 필요 시 수정한다.",
+      "notes": "header.tsx는 'use client' Client Component. 기존 ThemeToggle, MobileNav, useIsMounted 패턴 유지. 모바일 내비게이션(MobileNav → Sidebar)도 동일 링크를 반영해야 하므로 components/layout/sidebar.tsx를 읽고 navItems 확인 후 필요하면 함께 수정.",
+      "status": "completed",
+      "dependencies": [],
+      "createdAt": "2026-03-16T07:05:26.937Z",
+      "updatedAt": "2026-03-16T07:13:35.573Z",
+      "relatedFiles": [
+        {
+          "path": "components/layout/header.tsx",
+          "type": "TO_MODIFY",
+          "description": "헤더 네비게이션 링크 교체"
+        },
+        {
+          "path": "components/layout/sidebar.tsx",
+          "type": "REFERENCE",
+          "description": "모바일 네비게이션 Sidebar navItems 확인용"
+        },
+        {
+          "path": "components/layout/mobile-nav.tsx",
+          "type": "REFERENCE",
+          "description": "MobileNav 구조 확인용"
+        }
+      ],
+      "implementationGuide": "header.tsx 수정 (Client Component 유지):\n1. 데스크탑 nav의 Link 목록 교체:\n   - '홈' → href='/'\n   - '블로그' → href='/blog'\n   - '카테고리' → href='/category' (Phase 4에서 카테고리 목록 페이지 구현 전 링크만 추가)\n2. '대시보드' 링크 제거 (블로그 전용 헤더로 전환)\n3. 로고 텍스트를 블로그명으로 변경 (예: '개발 블로그')\n\npseudocode:\n<nav className='hidden md:flex ...'>\n  <Button variant='ghost' size='sm' asChild><Link href='/'>홈</Link></Button>\n  <Button variant='ghost' size='sm' asChild><Link href='/blog'>블로그</Link></Button>\n  <Button variant='ghost' size='sm' asChild><Link href='/category'>카테고리</Link></Button>\n</nav>",
+      "verificationCriteria": "헤더에 '홈', '블로그', '카테고리' 링크 3개 존재. '대시보드' 링크 없음. npm run lint 오류 없음.",
+      "analysisResult": "Phase 3 핵심 기능 구현: @notionhq/client v5.13.0(dataSources.query API 확인 완료), Phase 2 공통 모듈 전부 완료 상태에서 홈 페이지, 블로그 목록 페이지, Notion 블록 렌더러, 글 상세 페이지를 구현한다. 기술 스택: Next.js 16 App Router, Tailwind CSS v4, shadcn/ui, TypeScript. 코딩 규칙: camelCase 변수/함수, PascalCase 컴포넌트, kebab-case 파일명, JSDoc 주석 필수, console.log 금지, 에러 catch 후 처리. Server Component 우선 원칙. path alias @/* 사용.",
+      "summary": "header.tsx 데스크탑 네비게이션을 홈(/), 블로그(/blog), 카테고리(/category) 3개 링크로 교체 완료. 대시보드 링크 제거. 로고 텍스트 Dev Blog로 변경. sidebar.tsx navItems도 Home/BookOpen/Tag 아이콘으로 동일하게 교체하여 MobileNav(Sheet+Sidebar 재사용)에도 반영됨. lint 통과.",
+      "completedAt": "2026-03-16T07:13:35.571Z"
+    },
+    {
+      "id": "19abc1ff-9768-493b-ab4c-2a4ee3719816",
+      "name": "components/blog/notion-renderer.tsx — Notion 블록 렌더러 구현",
+      "description": "NotionBlock 배열을 받아 React JSX로 렌더링하는 NotionRenderer 컴포넌트를 구현한다. 8개 지원 블록 타입(paragraph, heading_1/2/3, bulleted_list_item, numbered_list_item, code, image, quote, divider)과 unsupported 폴백, RichText 어노테이션 인라인 렌더링, 리스트 블록 연속 그룹핑, 중첩 children 재귀 렌더링을 포함한다.",
+      "notes": "syntax highlighting은 외부 라이브러리 없이 CSS만으로 구현. code 블록 배경색은 bg-muted 활용. ScrollArea는 components/ui/scroll-area.tsx 설치 확인됨. Separator는 components/ui/separator.tsx 설치 확인됨. image 블록의 Next.js Image 사용 시 width/height를 알 수 없으므로 부모 div에 relative + 고정 높이 설정 또는 fill 모드 사용.",
+      "status": "completed",
+      "dependencies": [],
+      "createdAt": "2026-03-16T07:05:26.937Z",
+      "updatedAt": "2026-03-16T07:12:52.409Z",
+      "relatedFiles": [
+        {
+          "path": "components/blog/notion-renderer.tsx",
+          "type": "CREATE",
+          "description": "Notion 블록 렌더러 컴포넌트 신규 생성"
+        },
+        {
+          "path": "types/blog.ts",
+          "type": "DEPENDENCY",
+          "description": "NotionBlock, NotionRichText, NotionCodeBlock, NotionImageBlock 타입 참조"
+        },
+        {
+          "path": "components/ui/scroll-area.tsx",
+          "type": "DEPENDENCY",
+          "description": "코드 블록 가로 스크롤용 ScrollArea"
+        },
+        {
+          "path": "components/ui/separator.tsx",
+          "type": "DEPENDENCY",
+          "description": "divider 블록 렌더링용 Separator"
+        }
+      ],
+      "implementationGuide": "Server Component (use client 불필요).\n\n1. RichText 인라인 렌더러 함수 renderRichText(richTexts: NotionRichText[]): JSX\n   - 각 rt에 대해 bold→<strong>, italic→<em>, code→<code className='bg-muted px-1 rounded text-sm font-mono'>, strikethrough→<s>, underline→<u> 중첩 적용\n   - href 있으면 <a href={rt.href} target='_blank' rel='noopener noreferrer'> 래핑\n   - key={index} 사용\n\n2. 리스트 블록 그룹핑 함수 groupBlocks(blocks: NotionBlock[]): GroupedBlock[]\n   - 연속된 bulleted_list_item → { type: 'bulleted_group', items: NotionBlock[] }\n   - 연속된 numbered_list_item → { type: 'numbered_group', items: NotionBlock[] }\n   - 나머지 블록은 { type: 'single', block: NotionBlock } 그대로\n\n3. 개별 블록 렌더러 renderBlock(block: NotionBlock): JSX\n   - paragraph: <p className='my-3 leading-7'>{renderRichText(content)}</p>\n   - heading_1: <h1 className='text-3xl font-bold mt-8 mb-4'>\n   - heading_2: <h2 className='text-2xl font-semibold mt-6 mb-3'>\n   - heading_3: <h3 className='text-xl font-semibold mt-5 mb-2'>\n   - code: <ScrollArea><pre><code className='block p-4 text-sm font-mono'>{plainText}</code></pre></ScrollArea> + 언어 레이블 <span>\n   - image(external): <div><Image src={url} alt={caption} fill className='object-contain' /></div>\n   - image(file): <img src={url} alt={caption} className='max-w-full rounded-lg' /> (Next.js Image 사용 불가 시 일반 img 폴백)\n   - quote: <blockquote className='border-l-4 border-muted-foreground/30 pl-4 italic my-4'>\n   - divider: <Separator className='my-6' />\n   - unsupported: content가 NotionRichText[]면 <p>{renderRichText}</p>, null이면 null\n\n4. NotionRenderer 컴포넌트\n   - props: { blocks: NotionBlock[] }\n   - groupBlocks(blocks) 후 map으로 렌더링\n   - 그룹 타입에 따라 <ul>/<ol> 래핑\n   - children이 있으면 재귀 <NotionRenderer blocks={block.children} />\n\n5. image 블록에서 external 타입은 Next.js Image, file 타입은 일반 <img> 사용 (Next.js Image는 remotePatterns 등록 필요하므로 file URL은 안전하게 img로)",
+      "verificationCriteria": "TypeScript 오류 없음. npm run lint 통과. NotionRenderer에 blocks prop으로 NotionBlock 배열 전달 시 각 블록 타입별 JSX 반환. 리스트 블록 연속 시 ul/ol로 그룹핑. unsupported 블록은 플레인 텍스트 또는 null 반환.",
+      "analysisResult": "Phase 3 핵심 기능 구현: @notionhq/client v5.13.0(dataSources.query API 확인 완료), Phase 2 공통 모듈 전부 완료 상태에서 홈 페이지, 블로그 목록 페이지, Notion 블록 렌더러, 글 상세 페이지를 구현한다. 기술 스택: Next.js 16 App Router, Tailwind CSS v4, shadcn/ui, TypeScript. 코딩 규칙: camelCase 변수/함수, PascalCase 컴포넌트, kebab-case 파일명, JSDoc 주석 필수, console.log 금지, 에러 catch 후 처리. Server Component 우선 원칙. path alias @/* 사용.",
+      "summary": "notion-renderer.tsx 구현 완료. 8개 지원 블록 타입(paragraph, heading_1/2/3, bulleted/numbered_list_item, code, image, quote, divider) + unsupported 폴백 처리. RichText 어노테이션(bold/italic/code/strikethrough/underline/href) 인라인 렌더링. groupBlocks()로 연속 리스트 블록 ul/ol 그룹핑. children 재귀 렌더링. code 블록은 언어 레이블 + ScrollArea + bg-muted CSS. image 블록은 external→Next.js Image(fill), file→일반 img 폴백(PRD M-03 준수). Server Component. npm run lint 통과.",
+      "completedAt": "2026-03-16T07:12:52.407Z"
+    },
+    {
+      "id": "a8435a15-1cc7-4fe4-b392-b4c17e642db6",
+      "name": "app/page.tsx — 홈 페이지 블로그 홈으로 개편",
+      "description": "현재 스타터킷 소개 페이지인 app/page.tsx를 블로그 홈 페이지로 전환한다. Notion에서 최근 발행된 글 최대 6개를 가져와 PostCard 그리드로 표시하고, ISR 60초를 적용한다.",
+      "notes": "기존 app/page.tsx 전체를 교체. RootLayout(app/layout.tsx)이 Providers를 제공하므로 Header, Footer만 직접 import. fetchPublishedPosts는 lib/notion-api.ts에서 import.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "19abc1ff-9768-493b-ab4c-2a4ee3719816"
+        }
+      ],
+      "createdAt": "2026-03-16T07:05:26.937Z",
+      "updatedAt": "2026-03-16T07:18:10.703Z",
+      "relatedFiles": [
+        {
+          "path": "app/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "홈 페이지 — 스타터킷 소개에서 블로그 홈으로 전환"
+        },
+        {
+          "path": "lib/notion-api.ts",
+          "type": "DEPENDENCY",
+          "description": "fetchPublishedPosts 함수 import"
+        },
+        {
+          "path": "components/blog/post-card.tsx",
+          "type": "DEPENDENCY",
+          "description": "PostCard 컴포넌트 재사용"
+        },
+        {
+          "path": "components/layout/header.tsx",
+          "type": "DEPENDENCY",
+          "description": "Header 컴포넌트"
+        },
+        {
+          "path": "components/layout/footer.tsx",
+          "type": "DEPENDENCY",
+          "description": "Footer 컴포넌트"
+        }
+      ],
+      "implementationGuide": "Server Component (async function, use client 없음).\n\npseudocode:\nexport const revalidate = 60\n\nexport default async function Home() {\n  const posts = await fetchPublishedPosts({ limit: 6 })\n\n  return (\n    <div className='flex flex-col min-h-screen'>\n      <Header />\n      <main className='flex-1 max-w-5xl mx-auto px-6 py-16 w-full'>\n        <section className='mb-12 text-center'>\n          <h1 className='text-4xl font-bold mb-4'>개발 블로그</h1>\n          <p className='text-muted-foreground'>Notion으로 작성하고 자동으로 게시되는 기술 블로그</p>\n        </section>\n\n        <section>\n          <div className='flex items-center justify-between mb-6'>\n            <h2 className='text-xl font-semibold'>최근 글</h2>\n            <Button variant='outline' asChild><Link href='/blog'>전체 글 보기</Link></Button>\n          </div>\n\n          {posts.length === 0 ? (\n            <EmptyState message='아직 발행된 글이 없습니다.' />\n          ) : (\n            <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>\n              {posts.map(post => <PostCard key={post.id} post={post} />)}\n            </div>\n          )}\n        </section>\n      </main>\n      <Footer />\n    </div>\n  )\n}\n\n빈 상태 UI: 인라인으로 구현 (별도 컴포넌트 불필요, 단순 텍스트).",
+      "verificationCriteria": "/ 접근 시 블로그 소개 헤더와 최근 글 카드(최대 6개) 표시. data-testid='post-card' 요소 존재. '전체 글 보기' 버튼 → /blog 링크. 글 없을 시 빈 상태 메시지 표시. npm run lint 통과.",
+      "analysisResult": "Phase 3 핵심 기능 구현: @notionhq/client v5.13.0(dataSources.query API 확인 완료), Phase 2 공통 모듈 전부 완료 상태에서 홈 페이지, 블로그 목록 페이지, Notion 블록 렌더러, 글 상세 페이지를 구현한다. 기술 스택: Next.js 16 App Router, Tailwind CSS v4, shadcn/ui, TypeScript. 코딩 규칙: camelCase 변수/함수, PascalCase 컴포넌트, kebab-case 파일명, JSDoc 주석 필수, console.log 금지, 에러 catch 후 처리. Server Component 우선 원칙. path alias @/* 사용.",
+      "summary": "app/page.tsx를 블로그 홈 페이지로 완전 교체 완료. export const revalidate = 60 ISR 적용, fetchPublishedPosts({ limit: 6 }) 호출, PostCard 그리드(1열/2열/3열 반응형), 전체 글 보기 버튼(/blog 링크), 빈 상태 UI 포함. npm run lint 통과.",
+      "completedAt": "2026-03-16T07:18:10.700Z"
+    },
+    {
+      "id": "4ff9fb4c-aea9-4ba2-848b-8f94e3d95bd3",
+      "name": "app/(blog)/blog/page.tsx — 블로그 목록 페이지 구현",
+      "description": "현재 플레이스홀더인 app/(blog)/blog/page.tsx를 전체 발행 글 목록을 표시하는 실제 페이지로 구현한다. ISR 60초, 전체 글 목록 카드 그리드, 빈 상태 UI를 포함하며 Phase 4의 카테고리 필터/검색 UI 추가를 위한 구조적 공간을 확보한다.",
+      "notes": "Phase 4에서 카테고리 필터와 검색 기능을 추가할 것이므로, 글 목록 섹션 위에 주석으로 필터 영역 공간 표시. fetchPublishedPosts()는 기본 pageSize=100으로 전체 글 조회.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "19abc1ff-9768-493b-ab4c-2a4ee3719816"
+        }
+      ],
+      "createdAt": "2026-03-16T07:05:26.937Z",
+      "updatedAt": "2026-03-16T07:19:35.877Z",
+      "relatedFiles": [
+        {
+          "path": "app/(blog)/blog/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "블로그 목록 페이지 — 플레이스홀더에서 실제 구현으로 교체"
+        },
+        {
+          "path": "lib/notion-api.ts",
+          "type": "DEPENDENCY",
+          "description": "fetchPublishedPosts 함수 import"
+        },
+        {
+          "path": "components/blog/post-card.tsx",
+          "type": "DEPENDENCY",
+          "description": "PostCard 컴포넌트 재사용"
+        },
+        {
+          "path": "app/(blog)/layout.tsx",
+          "type": "REFERENCE",
+          "description": "블로그 레이아웃 — Header+Footer 이미 포함됨"
+        }
+      ],
+      "implementationGuide": "Server Component (async function, use client 없음).\n\npseudocode:\nexport const revalidate = 60\n\nexport default async function BlogPage() {\n  const posts = await fetchPublishedPosts()\n\n  return (\n    <div className='max-w-5xl mx-auto px-6 py-12 w-full'>\n      <div className='mb-8'>\n        <h1 className='text-3xl font-bold mb-2'>블로그</h1>\n        <p className='text-muted-foreground'>총 {posts.length}개의 글</p>\n      </div>\n\n      {/* Phase 4: 카테고리 필터 및 검색 UI 영역 — 추후 추가 */}\n\n      {posts.length === 0 ? (\n        <div className='text-center py-20 text-muted-foreground'>아직 발행된 글이 없습니다.</div>\n      ) : (\n        <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>\n          {posts.map(post => <PostCard key={post.id} post={post} />)}\n        </div>\n      )}\n    </div>\n  )\n}\n\n(blog)/layout.tsx가 Header+Footer를 제공하므로 별도 import 불필요.",
+      "verificationCriteria": "/blog 접근 시 발행된 글 카드 목록 표시. data-testid='post-card' 요소 개수가 Notion DB 발행됨 글 수와 일치. 빈 상태 UI 존재. 모바일(1열)/태블릿(2열) 그리드. npm run lint 통과.",
+      "analysisResult": "Phase 3 핵심 기능 구현: @notionhq/client v5.13.0(dataSources.query API 확인 완료), Phase 2 공통 모듈 전부 완료 상태에서 홈 페이지, 블로그 목록 페이지, Notion 블록 렌더러, 글 상세 페이지를 구현한다. 기술 스택: Next.js 16 App Router, Tailwind CSS v4, shadcn/ui, TypeScript. 코딩 규칙: camelCase 변수/함수, PascalCase 컴포넌트, kebab-case 파일명, JSDoc 주석 필수, console.log 금지, 에러 catch 후 처리. Server Component 우선 원칙. path alias @/* 사용.",
+      "summary": "app/(blog)/blog/page.tsx를 실제 블로그 목록 페이지로 교체 완료. revalidate=60 ISR 적용, fetchPublishedPosts() 전체 글 조회, 모바일 1열/태블릿 2열 반응형 그리드, 빈 상태 UI, Phase 4 필터/검색 영역 주석 확보. (blog)/layout.tsx의 Header+Footer 재사용. npm run lint 통과.",
+      "completedAt": "2026-03-16T07:19:35.875Z"
+    },
+    {
+      "id": "f84fba76-e3aa-439d-81c6-87a08753457f",
+      "name": "app/(blog)/blog/[slug]/page.tsx — 글 상세 페이지 구현",
+      "description": "현재 플레이스홀더인 app/(blog)/blog/[slug]/page.tsx를 Notion 본문 블록을 렌더링하는 실제 글 상세 페이지로 구현한다. generateStaticParams로 slug 사전 생성, ISR 60초, 2단계 API 호출(메타데이터+블록), 404 처리, NotionRenderer 본문 렌더링, 뒤로가기 버튼을 포함한다.",
+      "notes": "fetchPostBySlug는 전체 글 조회 후 slug 매칭 방식 (lib/notion-api.ts 구현 완료). notFound()는 next/navigation에서 import. ArrowLeft는 lucide-react에서 import. date-fns의 format, parseISO, ko locale 사용 (PostCard와 동일 패턴). generateStaticParams는 빌드 시 실행되어 정적 경로 생성.",
+      "status": "completed",
+      "dependencies": [
+        {
+          "taskId": "19abc1ff-9768-493b-ab4c-2a4ee3719816"
+        }
+      ],
+      "createdAt": "2026-03-16T07:05:26.937Z",
+      "updatedAt": "2026-03-16T07:21:05.920Z",
+      "relatedFiles": [
+        {
+          "path": "app/(blog)/blog/[slug]/page.tsx",
+          "type": "TO_MODIFY",
+          "description": "글 상세 페이지 — 플레이스홀더에서 실제 구현으로 교체"
+        },
+        {
+          "path": "lib/notion-api.ts",
+          "type": "DEPENDENCY",
+          "description": "fetchPostBySlug, fetchPageBlocks 함수 import"
+        },
+        {
+          "path": "components/blog/notion-renderer.tsx",
+          "type": "DEPENDENCY",
+          "description": "NotionRenderer 컴포넌트 — 본문 블록 렌더링"
+        },
+        {
+          "path": "components/blog/category-badge.tsx",
+          "type": "DEPENDENCY",
+          "description": "CategoryBadge — 헤더 카테고리 표시"
+        },
+        {
+          "path": "components/blog/tag-badge.tsx",
+          "type": "DEPENDENCY",
+          "description": "TagBadge — 헤더 태그 표시"
+        },
+        {
+          "path": "components/ui/separator.tsx",
+          "type": "DEPENDENCY",
+          "description": "헤더와 본문 사이 구분선"
+        },
+        {
+          "path": "types/blog.ts",
+          "type": "REFERENCE",
+          "description": "BlogPost, NotionBlock 타입 참조"
+        }
+      ],
+      "implementationGuide": "Server Component (async function, use client 없음). Next.js 16 App Router 기준 params는 Promise<{slug: string}>.\n\npseudocode:\nexport const revalidate = 60\n\nexport async function generateStaticParams() {\n  const posts = await fetchPublishedPosts()\n  return posts.map(p => ({ slug: p.slug }))\n}\n\nexport default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {\n  const { slug } = await params\n  const post = await fetchPostBySlug(slug)\n  if (!post) notFound()\n\n  const blocks = await fetchPageBlocks(post.id)\n\n  return (\n    <article className='max-w-3xl mx-auto px-6 py-12'>\n      <Button variant='ghost' size='sm' asChild className='mb-6 -ml-2'>\n        <Link href='/blog'><ArrowLeft className='h-4 w-4 mr-1' />블로그 목록</Link>\n      </Button>\n\n      <header className='mb-8'>\n        <CategoryBadge category={post.category} className='mb-3' />\n        <h1 className='text-3xl font-bold mb-3'>{post.title}</h1>\n        <div className='flex items-center gap-3 flex-wrap'>\n          <TagBadge tags={post.tags} />\n          <time dateTime={post.publishedAt} className='text-sm text-muted-foreground'>\n            {format(parseISO(post.publishedAt), 'yyyy. MM. dd.', { locale: ko })}\n          </time>\n        </div>\n      </header>\n\n      <Separator className='mb-8' />\n\n      <NotionRenderer blocks={blocks} />\n    </article>\n  )\n}\n\nNext.js 16에서 params는 반드시 await 필요 (Promise<{slug}>).",
+      "verificationCriteria": "/blog/first-test-post 접근 시 글 제목, 카테고리 badge, 태그, 발행일 헤더 표시. NotionRenderer로 본문 블록 렌더링. 뒤로가기 버튼 → /blog 링크. /blog/존재하지않는슬러그 접근 시 404 페이지 반환. generateStaticParams 반환값에 slug 배열 포함. npm run lint 통과.",
+      "analysisResult": "Phase 3 핵심 기능 구현: @notionhq/client v5.13.0(dataSources.query API 확인 완료), Phase 2 공통 모듈 전부 완료 상태에서 홈 페이지, 블로그 목록 페이지, Notion 블록 렌더러, 글 상세 페이지를 구현한다. 기술 스택: Next.js 16 App Router, Tailwind CSS v4, shadcn/ui, TypeScript. 코딩 규칙: camelCase 변수/함수, PascalCase 컴포넌트, kebab-case 파일명, JSDoc 주석 필수, console.log 금지, 에러 catch 후 처리. Server Component 우선 원칙. path alias @/* 사용.",
+      "summary": "app/(blog)/blog/[slug]/page.tsx를 실제 글 상세 페이지로 완전 교체 완료. Next.js 16 params Promise await 처리, generateStaticParams로 slug 사전 생성, revalidate=60 ISR, 2단계 API 호출(fetchPostBySlug+fetchPageBlocks), notFound() 404 처리, 글 헤더(카테고리/제목/태그/발행일), Separator, NotionRenderer 본문 렌더링, 뒤로가기 버튼 포함. npm run lint 통과.",
+      "completedAt": "2026-03-16T07:21:05.916Z"
     }
   ]
 }
