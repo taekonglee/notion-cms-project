@@ -5,6 +5,8 @@
 > **MVP 범위**: F001(글 목록), F002(글 상세), F003(카테고리 필터), F005(반응형), F006(다크모드), F007(ISR), F008(SEO) — 7개 기능
 >
 > **F004(검색)** 는 PRD 기준 "MVP 이후" 항목이나, 블로그 목록 페이지 UX 완성도를 위해 Phase 4에 포함
+>
+> **테스트 전략**: API 연동 및 비즈니스 로직이 포함된 Phase 2, 3, 4에서 Playwright MCP를 활용한 E2E 테스트를 각 기능 구현 직후 수행한다. 테스트 통과 후 다음 단계로 진행한다.
 
 ---
 
@@ -60,6 +62,17 @@ Phase 5     최적화 및 배포                            13~14일차
           page.tsx        # /category/[category] — 카테고리 페이지 (빈 파일)
   ```
 - [ ] `app/page.tsx` 홈 페이지 기본 구조 확인 (기존 파일 활용)
+
+#### 테스트 — 라우트 구조 접근 확인 (세부 작업 완료 후)
+
+> 사용 도구: `mcp__playwright__browser_navigate`, `mcp__playwright__browser_snapshot`
+
+- [ ] **시나리오 1**: `http://localhost:3000/blog` 접근 → 404가 아닌 페이지 반환 확인
+  - `browser_navigate` → `/blog`
+  - `browser_snapshot` → 페이지 접근성 트리에서 404 에러 텍스트 미존재 확인
+- [ ] **시나리오 2**: `http://localhost:3000/category/test` 접근 → 404가 아닌 페이지 반환 확인
+  - `browser_navigate` → `/category/test`
+  - `browser_snapshot` → 페이지 접근성 트리에서 404 에러 텍스트 미존재 확인
 
 ### 완료 기준 (DoD)
 
@@ -118,12 +131,41 @@ Phase 5     최적화 및 배포                            13~14일차
 - [ ] `components/blog/tag-badge.tsx` — 태그 badge 목록 (shadcn `badge` 래핑)
 - [ ] `components/blog/post-skeleton.tsx` — 로딩 상태 플레이스홀더 (shadcn `skeleton` 활용)
 
+#### 테스트 ① — Notion API 연결 및 데이터 fetch 확인 (`lib/notion-api.ts` 구현 완료 후)
+
+> 사용 도구: `mcp__playwright__browser_navigate`, `mcp__playwright__browser_snapshot`, `mcp__playwright__browser_evaluate`
+
+- [ ] **시나리오 1**: `fetchPublishedPosts()` 실제 API 응답 확인 → `/blog` 페이지에서 글 카드 렌더링
+  - `browser_navigate` → `http://localhost:3000/blog`
+  - `browser_snapshot` → 글 카드 요소(제목, 날짜) 최소 1개 이상 존재 확인
+- [ ] **시나리오 2**: `has_more` 페이지네이션 — 전체 발행 글 수와 카드 수 일치 검증
+  - `browser_evaluate` → `document.querySelectorAll('[data-testid="post-card"]').length` 로 카드 수 확인
+  - Notion DB 발행됨 글 수와 비교 (페이지 수가 10 초과 시 next_cursor 재조회 포함 여부)
+- [ ] **시나리오 3**: `fetchCategories()` — 카테고리 데이터 존재 확인
+  - `browser_navigate` → `http://localhost:3000/category` 또는 관련 페이지
+  - `browser_snapshot` → 카테고리 항목 요소 최소 1개 이상 존재 확인
+- [ ] **시나리오 4**: `withRetry()` — HTTP 429 재시도 로직 코드 리뷰 확인
+  - `lib/notion.ts` 코드에서 `Retry-After` 헤더 처리 및 최대 3회 재시도 로직 존재 확인 (브라우저 테스트 불필요, 코드 리뷰로 대체)
+
+#### 테스트 ② — 블로그 UI 컴포넌트 렌더링 확인 (컴포넌트 4종 구현 완료 후)
+
+> 사용 도구: `mcp__playwright__browser_snapshot`, `mcp__playwright__browser_evaluate`, `mcp__playwright__browser_take_screenshot`
+
+- [ ] **시나리오 1**: PostCard — 제목, badge, 날짜 요소 접근성 트리 확인
+  - `browser_navigate` → `http://localhost:3000/blog`
+  - `browser_snapshot` → 카드 내 제목(`heading`), 카테고리 badge, 발행일 텍스트 요소 존재 확인
+- [ ] **시나리오 2**: PostSkeleton — 로딩 상태 skeleton 요소 확인
+  - `browser_evaluate` → 페이지 로딩 지연 시뮬레이션 후 skeleton 클래스 요소 존재 확인
+- [ ] **시나리오 3**: 다크모드 — PostCard 테마 색상 스크린샷 비교
+  - `browser_evaluate` → `document.documentElement.classList.add('dark')` 실행
+  - `browser_take_screenshot` → 다크모드 카드 스크린샷 저장 후 배경/텍스트 색상 시각 확인
+
 ### 완료 기준 (DoD)
 
-- Notion API에서 실제 데이터 fetch 성공 (로컬 테스트 스크립트 또는 dev 서버 확인)
+- Notion API에서 실제 데이터 fetch 성공 (로컬 테스트 스크립트 또는 dev 서버 확인) (Playwright MCP 테스트 통과)
 - `withRetry()` 함수에 HTTP 429 재시도 로직 포함 확인
 - `types/blog.ts` TypeScript 타입 오류 없음 (`npm run lint` 통과)
-- 블로그 UI 컴포넌트 Storybook 또는 `/blog` 페이지에서 렌더링 확인
+- 블로그 UI 컴포넌트 Storybook 또는 `/blog` 페이지에서 렌더링 확인 (Playwright MCP 테스트 통과)
 
 ### 주요 파일/디렉토리
 
@@ -183,11 +225,68 @@ Phase 5     최적화 및 배포                            13~14일차
   - `image` 블록: `cover.type === "external"` / `"file"` 분기 처리 — [PRD M-03]
   - Next.js `<Image>` 컴포넌트로 이미지 최적화
 
+#### 테스트 ① — 홈 페이지 E2E (`app/page.tsx` 구현 후)
+
+> 사용 도구: `mcp__playwright__browser_resize`, `mcp__playwright__browser_click`, `mcp__playwright__browser_evaluate`, `mcp__playwright__browser_take_screenshot`
+
+- [ ] **시나리오 1**: 글 카드 6개 이하 제한 확인
+  - `browser_navigate` → `http://localhost:3000`
+  - `browser_evaluate` → `document.querySelectorAll('[data-testid="post-card"]').length` ≤ 6 검증
+- [ ] **시나리오 2**: '전체 글 보기' 버튼 → `/blog` 이동
+  - `browser_click` → '전체 글 보기' 버튼 요소
+  - `browser_snapshot` → URL이 `/blog`로 변경 확인
+- [ ] **시나리오 3**: 모바일(375px) 1열 그리드 확인
+  - `browser_resize` → width: 375, height: 812
+  - `browser_take_screenshot` → 카드 1열 레이아웃 시각 확인
+- [ ] **시나리오 4**: 데스크탑(1280px) 다열 그리드 확인
+  - `browser_resize` → width: 1280, height: 900
+  - `browser_take_screenshot` → 카드 2열 이상 레이아웃 시각 확인
+
+#### 테스트 ② — 블로그 목록 페이지 E2E (`app/(blog)/blog/page.tsx` 구현 후)
+
+> 사용 도구: `mcp__playwright__browser_navigate`, `mcp__playwright__browser_snapshot`, `mcp__playwright__browser_click`, `mcp__playwright__browser_resize`, `mcp__playwright__browser_evaluate`
+
+- [ ] **시나리오 1**: 전체 발행 글 카드 수 DB와 일치 검증
+  - `browser_navigate` → `http://localhost:3000/blog`
+  - `browser_evaluate` → 카드 수 카운트 후 Notion DB 발행됨 글 수와 비교
+- [ ] **시나리오 2**: 카드 클릭 → `/blog/[slug]` 이동
+  - `browser_click` → 첫 번째 글 카드
+  - `browser_snapshot` → URL이 `/blog/` 로 시작하는 경로로 이동 확인
+- [ ] **시나리오 3**: 빈 상태 UI 표시 확인
+  - 발행됨 글이 없는 환경 또는 필터 적용 상태에서 `browser_snapshot` → 빈 상태 메시지 요소 존재 확인
+- [ ] **시나리오 4**: 태블릿(768px) 2열 그리드 확인
+  - `browser_resize` → width: 768, height: 1024
+  - `browser_take_screenshot` → 카드 2열 레이아웃 시각 확인
+
+#### 테스트 ③ — 글 상세 페이지 및 Notion 블록 렌더링 E2E (글 상세 + `notion-renderer.tsx` 구현 후)
+
+> 사용 도구: `mcp__playwright__browser_navigate`, `mcp__playwright__browser_snapshot`, `mcp__playwright__browser_click`, `mcp__playwright__browser_evaluate`, `mcp__playwright__browser_network_requests`
+
+- [ ] **시나리오 1**: 글 헤더 (제목, 카테고리, 태그, 날짜) 확인
+  - `browser_navigate` → `http://localhost:3000/blog/[실제_slug]`
+  - `browser_snapshot` → 제목 heading, 카테고리 badge, 태그 badge, 발행일 텍스트 존재 확인
+- [ ] **시나리오 2**: 지원 블록 타입 8종 렌더링 확인
+  - `browser_evaluate` → paragraph, h1/h2/h3, ul/ol, pre(code), img, blockquote, hr 요소 존재 여부 각각 확인
+  - 해당 블록 타입이 포함된 Notion 글 페이지 사용
+- [ ] **시나리오 3**: 코드 블록 언어 레이블 + 신택스 하이라이팅 확인
+  - `browser_snapshot` → 코드 블록 언어명 텍스트(예: `javascript`, `typescript`) 요소 존재 확인
+  - `browser_take_screenshot` → 신택스 하이라이팅 색상 시각 확인
+- [ ] **시나리오 4**: 중첩 블록 (`has_children: true`) 렌더링
+  - 중첩 리스트 또는 중첩 토글이 포함된 글 페이지에서 `browser_snapshot` → 하위 블록 요소 존재 확인
+- [ ] **시나리오 5**: 404 처리 — 존재하지 않는 slug
+  - `browser_navigate` → `http://localhost:3000/blog/this-slug-does-not-exist-xyz`
+  - `browser_snapshot` → 404 페이지 또는 에러 메시지 확인
+- [ ] **시나리오 6**: 뒤로가기 버튼 → `/blog` 이동
+  - `browser_click` → 뒤로가기 버튼
+  - `browser_snapshot` → URL이 `/blog`인지 확인
+- [ ] **시나리오 7**: ISR `revalidate` 헤더 확인
+  - `browser_network_requests` → `/blog/[slug]` 응답 헤더에서 `cache-control` 또는 `x-nextjs-cache` 헤더 값 확인
+
 ### 완료 기준 (DoD)
 
-- 홈 페이지(`/`)에서 최근 글 6개 카드 표시 확인
-- 블로그 목록 페이지(`/blog`)에서 전체 발행 글 목록 표시 확인
-- 글 상세 페이지(`/blog/[slug]`)에서 Notion 본문 블록 렌더링 확인
+- 홈 페이지(`/`)에서 최근 글 6개 카드 표시 확인 (Playwright MCP 테스트 통과)
+- 블로그 목록 페이지(`/blog`)에서 전체 발행 글 목록 표시 확인 (Playwright MCP 테스트 통과)
+- 글 상세 페이지(`/blog/[slug]`)에서 Notion 본문 블록 렌더링 확인 (Playwright MCP 테스트 통과)
 - ISR 동작 확인: Notion 글 수정 후 60초 내 블로그 반영 (수동 측정)
 - 존재하지 않는 slug 접근 시 404 페이지 반환
 - 모바일(375px) 레이아웃 깨짐 없음 확인
@@ -245,12 +344,78 @@ Phase 5     최적화 및 배포                            13~14일차
   - `og:image`: 외부 URL(`cover.type === "external"`)만 사용, 내부 파일 URL 사용 금지 — [PRD M-03]
 - [ ] `app/(blog)/category/[category]/page.tsx` — 카테고리 페이지 `generateMetadata()` 구현
 
+#### 테스트 ① — 카테고리 페이지 E2E (`category/[category]/page.tsx` 구현 후)
+
+> 사용 도구: `mcp__playwright__browser_navigate`, `mcp__playwright__browser_snapshot`, `mcp__playwright__browser_click`, `mcp__playwright__browser_evaluate`
+
+- [ ] **시나리오 1**: 해당 카테고리 글만 표시 → badge 텍스트 전수 검증
+  - `browser_navigate` → `http://localhost:3000/category/[실제_카테고리명]`
+  - `browser_evaluate` → 모든 카테고리 badge 텍스트를 배열로 수집 후 현재 카테고리와 불일치 항목 없음 확인
+- [ ] **시나리오 2**: 카테고리 탭 클릭 → URL 변경 및 헤더 텍스트 변경
+  - `browser_click` → 다른 카테고리 탭
+  - `browser_snapshot` → URL과 페이지 헤더 텍스트가 선택한 카테고리명으로 변경 확인
+- [ ] **시나리오 3**: 빈 카테고리 빈 상태 UI 확인
+  - `browser_navigate` → 글이 없는 카테고리 경로 (또는 테스트용 빈 카테고리)
+  - `browser_snapshot` → 빈 상태 메시지 요소 존재 확인
+
+#### 테스트 ② — 블로그 목록 카테고리 필터 E2E (`category-filter.tsx` 구현 후)
+
+> 사용 도구: `mcp__playwright__browser_navigate`, `mcp__playwright__browser_click`, `mcp__playwright__browser_snapshot`, `mcp__playwright__browser_evaluate`
+
+- [ ] **시나리오 1**: 탭 클릭 → URL `?category=` 파라미터 반영 + 카드 필터링
+  - `browser_navigate` → `http://localhost:3000/blog`
+  - `browser_click` → 특정 카테고리 탭
+  - `browser_evaluate` → `window.location.search`에 `?category=` 파라미터 포함 확인
+  - `browser_evaluate` → 카드 badge가 모두 선택한 카테고리와 일치 확인
+- [ ] **시나리오 2**: '전체' 탭 → 쿼리 파라미터 제거 + 전체 목록 복원
+  - `browser_click` → '전체' 탭
+  - `browser_evaluate` → `window.location.search`가 빈 문자열이거나 `category` 파라미터 미포함 확인
+  - `browser_snapshot` → 전체 글 카드 목록 복원 확인
+
+#### 테스트 ③ — 검색 기능 E2E (`search-input.tsx` 구현 후)
+
+> 사용 도구: `mcp__playwright__browser_navigate`, `mcp__playwright__browser_type`, `mcp__playwright__browser_snapshot`, `mcp__playwright__browser_evaluate`, `mcp__playwright__browser_wait_for`
+
+- [ ] **시나리오 1**: 검색어 입력 → 300ms 후 제목 기준 필터링
+  - `browser_navigate` → `http://localhost:3000/blog`
+  - `browser_type` → 검색 입력창에 실제 글 제목 일부 입력
+  - `browser_wait_for` → 300ms debounce 대기
+  - `browser_snapshot` → 입력어가 포함된 글 카드만 표시 확인
+- [ ] **시나리오 2**: 결과 없음 → 빈 상태 UI
+  - `browser_type` → 검색 입력창에 존재하지 않는 문자열 입력 (예: `xyzzy-no-match-9999`)
+  - `browser_wait_for` → 300ms 대기
+  - `browser_snapshot` → 빈 상태 메시지 요소 존재 확인, 글 카드 0개 확인
+- [ ] **시나리오 3**: 검색어 삭제 → 전체 목록 복원
+  - 검색어 전체 삭제 후 `browser_wait_for` → 300ms 대기
+  - `browser_snapshot` → 전체 글 카드 목록 복원 확인
+
+#### 테스트 ④ — SEO 메타데이터 E2E (`generateMetadata` 전체 구현 후)
+
+> 사용 도구: `mcp__playwright__browser_navigate`, `mcp__playwright__browser_evaluate`
+
+- [ ] **시나리오 1**: 홈 페이지 title, description 메타 태그 존재 확인
+  - `browser_navigate` → `http://localhost:3000`
+  - `browser_evaluate` → `document.title`과 `document.querySelector('meta[name="description"]')?.content` 값 확인
+- [ ] **시나리오 2**: 블로그 목록 페이지 title, description 메타 태그 존재 확인
+  - `browser_navigate` → `http://localhost:3000/blog`
+  - `browser_evaluate` → title과 description 메타 태그 값 확인
+- [ ] **시나리오 3**: 글 상세 페이지 title(글 제목), description(첫 단락), og:image 확인
+  - `browser_navigate` → `http://localhost:3000/blog/[실제_slug]`
+  - `browser_evaluate` → `document.title`이 글 제목 포함 확인
+  - `browser_evaluate` → `document.querySelector('meta[name="description"]')?.content` 값 존재 확인
+  - `browser_evaluate` → `document.querySelector('meta[property="og:image"]')?.content` 값 존재 확인
+- [ ] **시나리오 4**: `og:image`에 Notion 내부 URL 미포함 검증 — [PRD M-03]
+  - `browser_evaluate` → `og:image` content 값에 `prod-files-secure` 또는 `amazonaws.com` 문자열 미포함 확인
+- [ ] **시나리오 5**: 카테고리 페이지 title에 카테고리명 포함 확인
+  - `browser_navigate` → `http://localhost:3000/category/[실제_카테고리명]`
+  - `browser_evaluate` → `document.title`에 해당 카테고리명 문자열 포함 확인
+
 ### 완료 기준 (DoD)
 
-- 카테고리 페이지(`/category/[category]`)에서 해당 카테고리 글만 필터링 표시 확인
-- 블로그 목록 페이지에서 카테고리 탭 클릭 시 필터링 동작 확인
-- 검색어 입력 시 300ms debounce 후 제목 기준 실시간 필터링 확인
-- 브라우저 개발자 도구에서 각 페이지 `<meta>` 태그(title, description, og:image) 확인
+- 카테고리 페이지(`/category/[category]`)에서 해당 카테고리 글만 필터링 표시 확인 (Playwright MCP 테스트 통과)
+- 블로그 목록 페이지에서 카테고리 탭 클릭 시 필터링 동작 확인 (Playwright MCP 테스트 통과)
+- 검색어 입력 시 300ms debounce 후 제목 기준 실시간 필터링 확인 (Playwright MCP 테스트 통과)
+- 브라우저 개발자 도구에서 각 페이지 `<meta>` 태그(title, description, og:image) 확인 (Playwright MCP 테스트 통과)
 - Lighthouse SEO 점수 확인 (목표: 90점 이상)
 
 ### 주요 파일/디렉토리
