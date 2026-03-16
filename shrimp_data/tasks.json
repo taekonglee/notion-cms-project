@@ -1,90 +1,6 @@
 {
   "tasks": [
     {
-      "id": "136b75a1-050c-4caa-b5d1-399289d63f20",
-      "name": "[Phase 1-1] @notionhq/client 패키지 설치 및 환경변수 설정",
-      "description": "Notion API 연동을 위한 패키지 설치와 환경변수 템플릿을 준비한다.\n\n작업 내용:\n1. npm install @notionhq/client 실행\n2. .env.example에 NOTION_API_KEY, NOTION_DATABASE_ID 추가\n3. .gitignore에서 .env* 제외, .env.example 커밋 허용 여부 확인 (이미 설정됨, 확인만)\n4. .env.local 파일이 없으면 .env.example 복사하여 생성 안내 (파일 생성은 사용자가 직접)\n\n완료 기준(DoD):\n- package.json dependencies에 @notionhq/client 추가됨\n- .env.example에 두 환경변수 존재\n- npm run lint 오류 없음",
-      "notes": "package.json 변경 전 사용자에게 알림 필요. .env.local은 직접 생성하지 않는다. .gitignore는 이미 올바르게 설정되어 있음.",
-      "status": "pending",
-      "dependencies": [],
-      "createdAt": "2026-03-13T11:38:38.495Z",
-      "updatedAt": "2026-03-13T11:38:38.495Z",
-      "relatedFiles": [
-        {
-          "path": "package.json",
-          "type": "TO_MODIFY",
-          "description": "@notionhq/client 의존성 추가"
-        },
-        {
-          "path": ".env.example",
-          "type": "TO_MODIFY",
-          "description": "Notion 환경변수 템플릿 추가"
-        },
-        {
-          "path": ".gitignore",
-          "type": "REFERENCE",
-          "description": "환경변수 파일 제외 설정 확인"
-        }
-      ],
-      "implementationGuide": "1. Bash: npm install @notionhq/client\n2. Edit .env.example: NOTION_API_KEY=your_notion_integration_api_key 와 NOTION_DATABASE_ID=your_notion_database_id 추가\n3. Read .gitignore 확인 (.env* 제외, !.env.example 허용 이미 설정됨)\n4. Bash: npm run lint",
-      "verificationCriteria": "package.json에 @notionhq/client 존재, .env.example에 NOTION_API_KEY와 NOTION_DATABASE_ID 존재, npm run lint 오류 없음",
-      "analysisResult": "Notion CMS 블로그 프로젝트 (Next.js 16.1.6 App Router). ROADMAP.md Phase 1~5 순서 엄수. 기존 패턴: (dashboard) 라우트 그룹, components/layout/header|footer 재사용, cn() 유틸, shadcn/ui 18개 컴포넌트. 모든 Notion API 호출은 withRetry() 필수. 블로그 페이지 전체 revalidate=60 ISR 필수. og:image는 외부 URL만 허용."
-    },
-    {
-      "id": "b7830597-100d-45a7-a969-17868e40269e",
-      "name": "[Phase 1-2] (blog) 라우트 그룹 디렉토리 및 기본 파일 생성",
-      "description": "블로그 전용 라우트 그룹 app/(blog)/ 와 하위 페이지 파일을 생성한다.\n\n생성할 파일:\n- app/(blog)/layout.tsx: 블로그 공통 레이아웃 (Header + main + Footer)\n- app/(blog)/blog/page.tsx: /blog 글 목록 페이지 (빈 구조)\n- app/(blog)/blog/[slug]/page.tsx: /blog/[slug] 글 상세 페이지 (빈 구조)\n- app/(blog)/category/[category]/page.tsx: /category/[category] 카테고리 페이지 (빈 구조)\n\n라우트 그룹 규칙: (blog) 괄호는 URL에 영향 없음. /blog, /category/[category]가 실제 URL임.",
-      "notes": "Next.js 16에서 params는 Promise 타입. use(params) 또는 async/await로 unwrap 필요. (dashboard)/layout.tsx 패턴 참조하되 사이드바 없이 Header+Footer만 사용.",
-      "status": "pending",
-      "dependencies": [
-        {
-          "taskId": "136b75a1-050c-4caa-b5d1-399289d63f20"
-        }
-      ],
-      "createdAt": "2026-03-13T11:38:38.495Z",
-      "updatedAt": "2026-03-13T11:38:38.495Z",
-      "relatedFiles": [
-        {
-          "path": "app/(blog)/layout.tsx",
-          "type": "CREATE",
-          "description": "블로그 공통 레이아웃"
-        },
-        {
-          "path": "app/(blog)/blog/page.tsx",
-          "type": "CREATE",
-          "description": "글 목록 페이지 진입점"
-        },
-        {
-          "path": "app/(blog)/blog/[slug]/page.tsx",
-          "type": "CREATE",
-          "description": "글 상세 페이지 진입점"
-        },
-        {
-          "path": "app/(blog)/category/[category]/page.tsx",
-          "type": "CREATE",
-          "description": "카테고리 페이지 진입점"
-        },
-        {
-          "path": "app/(dashboard)/layout.tsx",
-          "type": "REFERENCE",
-          "description": "레이아웃 패턴 참조"
-        },
-        {
-          "path": "components/layout/header.tsx",
-          "type": "DEPENDENCY",
-          "description": "블로그 레이아웃에서 재사용"
-        },
-        {
-          "path": "components/layout/footer.tsx",
-          "type": "DEPENDENCY",
-          "description": "블로그 레이아웃에서 재사용"
-        }
-      ],
-      "implementationGuide": "app/(blog)/layout.tsx 구조:\n- Server Component (use client 없음)\n- import Header from components/layout/header\n- import Footer from components/layout/footer\n- return: div(flex flex-col min-h-screen) > Header + main(flex-1) {children} + Footer\n\napp/(blog)/blog/page.tsx:\n- export const revalidate = 60\n- export default function BlogListPage() { return <main>블로그 목록 준비 중</main> }\n\napp/(blog)/blog/[slug]/page.tsx:\n- export const revalidate = 60\n- export default function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) { return <main>글 상세 준비 중</main> }\n\napp/(blog)/category/[category]/page.tsx:\n- export const revalidate = 60\n- export default function CategoryPage({ params }: { params: Promise<{ category: string }> }) { return <main>카테고리 준비 중</main> }",
-      "verificationCriteria": "npm run dev 후 /blog 접근 시 200 응답, /category/test 접근 시 200 응답, /blog/any-slug 접근 시 200 응답, npm run lint 오류 없음",
-      "analysisResult": "Notion CMS 블로그 프로젝트 (Next.js 16.1.6 App Router). ROADMAP.md Phase 1~5 순서 엄수. 기존 패턴: (dashboard) 라우트 그룹, components/layout/header|footer 재사용, cn() 유틸, shadcn/ui 18개 컴포넌트. 모든 Notion API 호출은 withRetry() 필수. 블로그 페이지 전체 revalidate=60 ISR 필수. og:image는 외부 URL만 허용."
-    },
-    {
       "id": "9d95f6c7-ed82-41c4-9403-47b2093765c0",
       "name": "[Phase 2-1] TypeScript 타입 정의 (types/blog.ts)",
       "description": "블로그 전체에서 사용할 TypeScript 타입을 정의한다. PRD 섹션 6 기반.\n\n정의할 타입:\n- BlogPost: id, title, category, tags, publishedAt, status, slug\n- NotionBlock: id, type(paragraph|heading_1|heading_2|heading_3|bulleted_list_item|numbered_list_item|code|image|quote|divider), content, children?\n- NotionRichText: plainText, href, annotations(bold,italic,strikethrough,underline,code)\n- NotionCodeBlock: language, richText\n- NotionImageBlock: type('external'|'file'), url, caption\n- FetchPostsOptions: pageSize?, startCursor?\n- FetchPostsResult: posts, hasMore, nextCursor?",
@@ -464,6 +380,90 @@
       "implementationGuide": "next.config.ts 확인/수정:\n  images.remotePatterns에 notion 이미지 도메인 추가:\n  { protocol: 'https', hostname: '**.notion.so' }\n  { protocol: 'https', hostname: 'images.unsplash.com' } 등\n\nnpm run build 실행 후 오류 점검:\n  - 정적 생성 실패 시 generateStaticParams 확인\n  - 타입 오류 수정\n  - lint 오류 수정\n\n반응형 점검 체크리스트:\n  - 375px: 1열 그리드, 폰트 가독성, 터치 버튼 크기\n  - 768px: 2열 그리드 전환 확인\n  - 1280px: 최대 너비 컨테이너 확인\n\n다크모드 점검:\n  - PostCard, CategoryBadge, TagBadge 다크모드 색상\n  - NotionRenderer 코드 블록, 인용구 다크모드\n  - 이미지 밝기 필터 검토",
       "verificationCriteria": "npm run build 오류 없음, next.config.ts 이미지 도메인 설정 완료, 모바일 375px 레이아웃 정상, 다크모드 전환 시 블로그 컴포넌트 색상 정상, npm run lint 통과",
       "analysisResult": "Notion CMS 블로그 프로젝트 (Next.js 16.1.6 App Router). ROADMAP.md Phase 1~5 순서 엄수. 기존 패턴: (dashboard) 라우트 그룹, components/layout/header|footer 재사용, cn() 유틸, shadcn/ui 18개 컴포넌트. 모든 Notion API 호출은 withRetry() 필수. 블로그 페이지 전체 revalidate=60 ISR 필수. og:image는 외부 URL만 허용."
+    },
+    {
+      "id": "136b75a1-050c-4caa-b5d1-399289d63f20",
+      "name": "[Phase 1-1] @notionhq/client 패키지 설치 및 환경변수 설정",
+      "description": "Notion API 연동을 위한 패키지 설치와 환경변수 템플릿을 준비한다.\n\n작업 내용:\n1. npm install @notionhq/client 실행\n2. .env.example 파일 생성 — NOTION_API_KEY, NOTION_DATABASE_ID 두 변수 추가\n3. .gitignore 확인 — .env* 제외, !.env.example 허용이 이미 설정되어 있으므로 수정 불필요\n4. .env.local은 사용자가 직접 생성해야 함 — 파일 생성 안내만 제공 (직접 생성 금지)",
+      "notes": ".env.local 직접 생성 금지 (shrimp-rules.md §9: .env.local 직접 수정/생성 금지). package.json dependencies 변경 전 사용자에게 알림 필요 (글로벌 CLAUDE.md 규칙).",
+      "status": "pending",
+      "dependencies": [],
+      "createdAt": "2026-03-13T11:38:38.495Z",
+      "updatedAt": "2026-03-16T05:43:09.246Z",
+      "relatedFiles": [
+        {
+          "path": "package.json",
+          "type": "TO_MODIFY",
+          "description": "@notionhq/client dependencies 추가됨"
+        },
+        {
+          "path": ".env.example",
+          "type": "CREATE",
+          "description": "Notion 환경변수 템플릿"
+        },
+        {
+          "path": ".gitignore",
+          "type": "REFERENCE",
+          "description": ".env* 제외 규칙 확인용 — 수정 불필요"
+        }
+      ],
+      "implementationGuide": "1. npm install @notionhq/client 실행\n2. 프로젝트 루트에 .env.example 파일 생성:\n   NOTION_API_KEY=your_notion_integration_api_key\n   NOTION_DATABASE_ID=your_notion_database_id\n3. .gitignore 파일 확인 (수정 불필요 — .env* 이미 제외, !.env.example 이미 허용)\n4. 사용자에게 .env.local 생성 방법 안내",
+      "verificationCriteria": "1. package.json dependencies에 @notionhq/client 추가됨\n2. .env.example 파일에 NOTION_API_KEY, NOTION_DATABASE_ID 두 변수 존재\n3. npm run lint 오류 없음",
+      "analysisResult": "Phase 1 목표: Notion API 연결 환경 준비 + 블로그 라우트 그룹 디렉토리 구조 생성. 기존 (dashboard) 라우트 그룹 패턴을 참고하되 블로그 특성(Sidebar 불필요, Header+main+Footer 구조)에 맞게 적용. shrimp-rules.md 준수 필수."
+    },
+    {
+      "id": "b7830597-100d-45a7-a969-17868e40269e",
+      "name": "[Phase 1-2] (blog) 라우트 그룹 디렉토리 및 기본 파일 생성",
+      "description": "블로그 전용 라우트 그룹 app/(blog)/ 와 하위 페이지 파일을 생성한다.\n\n생성할 파일:\n- app/(blog)/layout.tsx: 블로그 공통 레이아웃 (Header + main + Footer)\n- app/(blog)/blog/page.tsx: /blog 글 목록 페이지 (빈 구조)\n- app/(blog)/blog/[slug]/page.tsx: /blog/[slug] 글 상세 페이지 (빈 구조)\n- app/(blog)/category/[category]/page.tsx: /category/[category] 카테고리 페이지 (빈 구조)\n\n라우트 그룹 규칙: (blog) 괄호는 URL에 영향 없음. /blog, /category/[category]가 실제 URL임.",
+      "notes": "기존 app/(dashboard)/layout.tsx 패턴 참고. 단 blog layout은 Sidebar 없이 Header+Footer만 사용. Header는 Client Component이지만 layout.tsx 자체는 Server Component로 유지. RootLayout에 이미 Providers가 있으므로 blog layout에 ThemeProvider 중복 추가 금지.",
+      "status": "pending",
+      "dependencies": [
+        {
+          "taskId": "136b75a1-050c-4caa-b5d1-399289d63f20"
+        }
+      ],
+      "createdAt": "2026-03-13T11:38:38.495Z",
+      "updatedAt": "2026-03-16T05:43:09.246Z",
+      "relatedFiles": [
+        {
+          "path": "app/(blog)/layout.tsx",
+          "type": "CREATE",
+          "description": "블로그 공통 레이아웃 — Header + main + Footer"
+        },
+        {
+          "path": "app/(blog)/blog/page.tsx",
+          "type": "CREATE",
+          "description": "/blog 글 목록 페이지 진입점 (빈 구조)"
+        },
+        {
+          "path": "app/(blog)/blog/[slug]/page.tsx",
+          "type": "CREATE",
+          "description": "/blog/[slug] 글 상세 페이지 진입점 (빈 구조)"
+        },
+        {
+          "path": "app/(blog)/category/[category]/page.tsx",
+          "type": "CREATE",
+          "description": "/category/[category] 카테고리 페이지 진입점 (빈 구조)"
+        },
+        {
+          "path": "app/(dashboard)/layout.tsx",
+          "type": "REFERENCE",
+          "description": "라우트 그룹 레이아웃 패턴 참고용"
+        },
+        {
+          "path": "components/layout/header.tsx",
+          "type": "DEPENDENCY",
+          "description": "블로그 레이아웃에서 재사용"
+        },
+        {
+          "path": "components/layout/footer.tsx",
+          "type": "DEPENDENCY",
+          "description": "블로그 레이아웃에서 재사용"
+        }
+      ],
+      "implementationGuide": "app/(blog)/layout.tsx 구조 (Server Component, JSDoc 포함):\n  import Header from @/components/layout/header\n  import Footer from @/components/layout/footer\n  export default function BlogLayout({ children }):\n    return div.min-h-screen.flex.flex-col\n      Header /\n      main.flex-1.container.mx-auto.px-4.py-8\n        children\n      Footer /\n\napp/(blog)/blog/page.tsx (Server Component, 빈 구조):\n  JSDoc 주석: 블로그 전체 글 목록 페이지 (/blog)\n  export default function BlogPage():\n    return div (빈 컨테이너, 추후 Phase 3에서 구현)\n\napp/(blog)/blog/[slug]/page.tsx (Server Component, 빈 구조):\n  JSDoc 주석: 블로그 글 상세 페이지 (/blog/[slug])\n  export default function BlogPostPage({ params }):\n    return div (빈 컨테이너, 추후 Phase 3에서 구현)\n\napp/(blog)/category/[category]/page.tsx (Server Component, 빈 구조):\n  JSDoc 주석: 카테고리별 글 목록 페이지 (/category/[category])\n  export default function CategoryPage({ params }):\n    return div (빈 컨테이너, 추후 Phase 4에서 구현)\n\n주의: revalidate, generateStaticParams는 Phase 3, 4에서 추가. 지금은 빈 구조만.",
+      "verificationCriteria": "1. npm run dev 실행 후 /blog 접근 시 404가 아닌 빈 페이지 반환\n2. /category/test 접근 시 404가 아닌 빈 페이지 반환\n3. /blog/any-slug 접근 시 404가 아닌 빈 페이지 반환\n4. npm run lint 오류 없음\n5. 모든 파일이 Server Component (use client 없음, layout.tsx 포함)",
+      "analysisResult": "Phase 1 목표: Notion API 연결 환경 준비 + 블로그 라우트 그룹 디렉토리 구조 생성. 기존 (dashboard) 라우트 그룹 패턴을 참고하되 블로그 특성(Sidebar 불필요, Header+main+Footer 구조)에 맞게 적용. shrimp-rules.md 준수 필수."
     }
   ]
 }
