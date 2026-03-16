@@ -461,15 +461,15 @@ Phase 5     최적화 및 배포                            13~14일차
 
 #### Vercel 배포
 
-- [ ] Vercel 프로젝트 연결 (또는 기존 연결 확인)
-- [ ] Vercel 환경변수 설정
+- [x] Vercel 프로젝트 연결 (또는 기존 연결 확인)
+- [x] Vercel 환경변수 설정
   - `NOTION_API_KEY`
   - `NOTION_DATABASE_ID`
 - [x] 프로덕션 빌드 확인
   ```bash
   npm run build
   ```
-- [ ] `main` 브랜치 push → Vercel 자동 배포 트리거
+- [x] `main` 브랜치 push → Vercel 자동 배포 트리거 (https://notion-cms-project-five.vercel.app/)
 
 #### 성능 측정
 

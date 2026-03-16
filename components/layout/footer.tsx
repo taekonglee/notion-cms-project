@@ -7,7 +7,7 @@ export function Footer() {
     <footer className="border-t py-6">
       <div className="px-6 flex flex-col items-center justify-between gap-4 md:flex-row">
         <p className="text-sm text-muted-foreground">
-          © {new Date().getFullYear()} Next.js 스타터킷. All rights reserved.
+          © {new Date().getFullYear()} Dev Blog. All rights reserved.
         </p>
         <div className="flex items-center gap-4 text-sm text-muted-foreground">
           <a
