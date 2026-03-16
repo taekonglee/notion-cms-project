@@ -14,6 +14,7 @@ npm run dev        # 개발 서버 실행
 npm run build      # 프로덕션 빌드
 npm run start      # 프로덕션 서버 실행
 npm run lint       # ESLint 검사
+npm run check-all   # 모든 검사 통합 실행 (권장)
 ```
 
 테스트 명령어는 현재 설정되어 있지 않습니다.
@@ -21,6 +22,13 @@ npm run lint       # ESLint 검사
 shadcn/ui 컴포넌트 추가:
 ```bash
 npx shadcn@latest add <component-name>
+```
+
+## ✅ 작업 완료 체크리스트
+
+```bash
+npm run check-all   # 모든 검사 통과 확인
+npm run build       # 빌드 성공 확인
 ```
 
 ## 아키텍처
