@@ -79,7 +79,7 @@ export function Header() {
       <div className="flex h-16 items-center px-6 gap-4">
         {/* 로고 */}
         <Link href="/" className="font-bold text-lg mr-4">
-          스타터킷
+          Dev Blog
         </Link>
 
         {/* 데스크탑 네비게이션 */}
@@ -88,7 +88,10 @@ export function Header() {
             <Link href="/">홈</Link>
           </Button>
           <Button variant="ghost" size="sm" asChild>
-            <Link href="/dashboard">대시보드</Link>
+            <Link href="/blog">블로그</Link>
+          </Button>
+          <Button variant="ghost" size="sm" asChild>
+            <Link href="/category">카테고리</Link>
           </Button>
         </nav>
 

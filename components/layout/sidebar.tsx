@@ -2,14 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, BarChart3, Settings } from "lucide-react";
+import { Home, BookOpen, Tag } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /** 사이드바 네비게이션 항목 정의 */
 const navItems = [
-  { href: "/dashboard", icon: LayoutDashboard, label: "대시보드" },
-  { href: "/analytics", icon: BarChart3, label: "분석" },
-  { href: "/settings", icon: Settings, label: "설정" },
+  { href: "/", icon: Home, label: "홈" },
+  { href: "/blog", icon: BookOpen, label: "블로그" },
+  { href: "/category", icon: Tag, label: "카테고리" },
 ];
 
 export interface SidebarProps {
@@ -37,7 +37,7 @@ export function Sidebar({ className, onNavClick }: SidebarProps) {
       {/* 로고 영역 */}
       <div className="h-16 flex items-center px-6 border-b">
         <Link href="/" className="font-bold text-lg text-sidebar-foreground">
-          스타터킷
+          Dev Blog
         </Link>
       </div>
 
