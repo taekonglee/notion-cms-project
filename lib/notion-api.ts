@@ -2,9 +2,7 @@
  * Notion API 데이터 fetch 함수 모음
  * withRetry()로 Rate Limit(HTTP 429) 재시도 처리 포함
  *
- * @notionhq/client v5.x 변경사항:
- * - databases.query() 제거 → dataSources.query() 사용 (data_source_id 파라미터)
- * - databases.retrieve()는 properties 없음 → dataSources.retrieve() 사용
+ * @notionhq/client v5.x: databases.query() 제거 → dataSources.query() 사용
  */
 import type {
   DataSourceObjectResponse,
@@ -167,36 +165,36 @@ function mapBlockToNotionBlock(
 export function mapPageToBlogPost(page: PageObjectResponse): BlogPost {
   const props = page.properties;
 
-  // Title 속성 추출
-  const titleProp = props["Title"];
+  // 제목 속성 추출 (Notion DB: "제목")
+  const titleProp = props["제목"];
   const title =
     titleProp?.type === "title"
       ? titleProp.title.map((t) => t.plain_text).join("")
       : "";
 
-  // Category 속성 추출
-  const categoryProp = props["Category"];
+  // 카테고리 속성 추출 (Notion DB: "선택")
+  const categoryProp = props["선택"];
   const category =
     categoryProp?.type === "select"
       ? (categoryProp.select?.name ?? "")
       : "";
 
-  // Tags 속성 추출
-  const tagsProp = props["Tags"];
+  // 태그 속성 추출 (Notion DB: "태그")
+  const tagsProp = props["태그"];
   const tags =
     tagsProp?.type === "multi_select"
       ? tagsProp.multi_select.map((t) => t.name)
       : [];
 
-  // Published 날짜 추출
-  const publishedProp = props["Published"];
+  // 발행일 속성 추출 (Notion DB: "발행일")
+  const publishedProp = props["발행일"];
   const publishedAt =
     publishedProp?.type === "date"
       ? (publishedProp.date?.start ?? "")
       : "";
 
-  // Status 속성 추출
-  const statusProp = props["Status"];
+  // 상태 속성 추출 (Notion DB: "상태")
+  const statusProp = props["상태"];
   const status =
     statusProp?.type === "select"
       ? ((statusProp.select?.name ?? "초안") as "초안" | "발행됨")
@@ -255,15 +253,14 @@ export async function fetchPublishedPosts(
   let cursor: string | undefined;
 
   do {
-    // @notionhq/client v5: databases.query → dataSources.query
     const response = await withRetry(() =>
       notionClient.dataSources.query({
         data_source_id: NOTION_DATABASE_ID,
         filter: {
-          property: "Status",
+          property: "상태",
           select: { equals: "발행됨" },
         },
-        sorts: [{ property: "Published", direction: "descending" }],
+        sorts: [{ property: "발행일", direction: "descending" }],
         page_size: pageSize,
         ...(cursor ? { start_cursor: cursor } : {}),
       })
@@ -357,8 +354,6 @@ export async function fetchPageBlocks(blockId: string): Promise<NotionBlock[]> {
  * @returns 카테고리 이름 문자열 배열
  */
 export async function fetchCategories(): Promise<string[]> {
-  // @notionhq/client v5: databases.retrieve는 properties 없음
-  // dataSources.retrieve 사용 (DataSourceObjectResponse에 properties 포함)
   const dataSource = await withRetry(() =>
     notionClient.dataSources.retrieve({
       data_source_id: NOTION_DATABASE_ID,
@@ -366,7 +361,8 @@ export async function fetchCategories(): Promise<string[]> {
   );
 
   const response = dataSource as DataSourceObjectResponse;
-  const categoryProp = response.properties?.["Category"];
+  // Notion DB 카테고리 속성명: "선택"
+  const categoryProp = response.properties?.["선택"];
   if (!categoryProp || categoryProp.type !== "select") return [];
 
   return categoryProp.select.options.map((option) => option.name);
