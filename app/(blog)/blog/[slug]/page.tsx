@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { ArrowLeft } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { ko } from "date-fns/locale";
@@ -13,6 +14,7 @@ import {
   fetchPostBySlug,
   fetchPageBlocks,
 } from "@/lib/notion-api";
+import type { NotionRichText } from "@/types/blog";
 
 /** ISR: 60초마다 재검증 */
 export const revalidate = 60;
@@ -28,6 +30,48 @@ export async function generateStaticParams() {
 
 interface BlogPostPageProps {
   params: Promise<{ slug: string }>;
+}
+
+/**
+ * 글 상세 페이지 동적 SEO 메타데이터 생성
+ * - title: 글 제목
+ * - description: 첫 번째 paragraph 블록 텍스트 (최대 160자)
+ * - og:image: coverImage 외부 URL (PRD M-03 — 내부 URL 사용 금지)
+ * @param params - URL 동적 세그먼트 ({ slug: string })
+ */
+export async function generateMetadata({
+  params,
+}: BlogPostPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const post = await fetchPostBySlug(slug);
+
+  if (!post) return { title: "글을 찾을 수 없습니다" };
+
+  // 첫 번째 paragraph 블록에서 description 추출
+  const blocks = await fetchPageBlocks(post.id);
+  const firstParagraph = blocks.find((b) => b.type === "paragraph");
+  let description = `${post.title} - Dev Blog`;
+
+  if (
+    firstParagraph &&
+    Array.isArray(firstParagraph.content) &&
+    firstParagraph.content.length > 0 &&
+    "plainText" in firstParagraph.content[0]
+  ) {
+    const text = (firstParagraph.content as NotionRichText[])
+      .map((r) => r.plainText)
+      .join("")
+      .slice(0, 160);
+    if (text.trim()) description = text;
+  }
+
+  return {
+    title: `${post.title} | Dev Blog`,
+    description,
+    openGraph: post.coverImage
+      ? { images: [{ url: post.coverImage }] }
+      : undefined,
+  };
 }
 
 /**

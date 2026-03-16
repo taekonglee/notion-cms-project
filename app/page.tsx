@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
@@ -7,6 +8,12 @@ import { fetchPublishedPosts } from "@/lib/notion-api";
 
 /** ISR: 60초마다 재검증 */
 export const revalidate = 60;
+
+/** 홈 페이지 SEO 메타데이터 */
+export const metadata: Metadata = {
+  title: "개발 블로그 | Dev Blog",
+  description: "Notion으로 작성하고 자동으로 게시되는 개인 기술 블로그입니다.",
+};
 
 /**
  * 블로그 홈 페이지

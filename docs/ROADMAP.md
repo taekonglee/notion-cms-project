@@ -313,21 +313,21 @@ Phase 5     최적화 및 배포                            13~14일차
 
 #### 카테고리 페이지 (`app/(blog)/category/[category]/page.tsx`) — [PRD F003]
 
-- [ ] `generateStaticParams()` — `fetchCategories()`로 카테고리 목록 사전 생성
-- [ ] `export const revalidate = 60` — ISR 60초 적용
-- [ ] 선택된 카테고리명 헤더 표시
-- [ ] 해당 카테고리 글 카드 그리드 목록 (`has_more`/`next_cursor` 페이지네이션 포함)
-- [ ] 전체 카테고리 목록 탭 내비게이션 (다른 카테고리 이동)
-- [ ] 글 없음 빈 상태 UI
+- [x] `generateStaticParams()` — `fetchCategories()`로 카테고리 목록 사전 생성
+- [x] `export const revalidate = 60` — ISR 60초 적용
+- [x] 선택된 카테고리명 헤더 표시
+- [x] 해당 카테고리 글 카드 그리드 목록 (`has_more`/`next_cursor` 페이지네이션 포함)
+- [x] 전체 카테고리 목록 탭 내비게이션 (다른 카테고리 이동)
+- [x] 글 없음 빈 상태 UI
 
 #### 블로그 목록 페이지 — 카테고리 필터 추가 (`app/(blog)/blog/page.tsx`)
 
-- [ ] 카테고리 필터 탭 (전체 + 카테고리 목록) — 클라이언트 컴포넌트로 분리
-- [ ] URL 쿼리 파라미터(`?category=`) 기반 필터 상태 관리
+- [x] 카테고리 필터 탭 (전체 + 카테고리 목록) — 클라이언트 컴포넌트로 분리
+- [x] URL 쿼리 파라미터(`?category=`) 기반 필터 상태 관리
 
 #### 검색 기능 — [PRD F004]
 
-- [ ] `components/blog/search-input.tsx` — 클라이언트 컴포넌트
+- [x] `components/blog/search-input.tsx` — 클라이언트 컴포넌트
   - 제목 기반 문자열 포함 검색 (클라이언트 사이드)
   - debounce 300ms 적용
   - 결과 없음 상태 UI
@@ -335,25 +335,25 @@ Phase 5     최적화 및 배포                            13~14일차
 
 #### SEO 메타데이터 — [PRD F008]
 
-- [ ] `app/page.tsx` — 홈 페이지 정적 메타데이터 (`metadata` export)
-- [ ] `app/(blog)/blog/page.tsx` — 블로그 목록 정적 메타데이터
-- [ ] `app/(blog)/blog/[slug]/page.tsx` — 글 상세 `generateMetadata()` 구현
+- [x] `app/page.tsx` — 홈 페이지 정적 메타데이터 (`metadata` export)
+- [x] `app/(blog)/blog/page.tsx` — 블로그 목록 정적 메타데이터
+- [x] `app/(blog)/blog/[slug]/page.tsx` — 글 상세 `generateMetadata()` 구현
   - `title`: 글 제목
   - `description`: 글 첫 단락 추출
   - `og:image`: 외부 URL(`cover.type === "external"`)만 사용, 내부 파일 URL 사용 금지 — [PRD M-03]
-- [ ] `app/(blog)/category/[category]/page.tsx` — 카테고리 페이지 `generateMetadata()` 구현
+- [x] `app/(blog)/category/[category]/page.tsx` — 카테고리 페이지 `generateMetadata()` 구현
 
 #### 테스트 ① — 카테고리 페이지 E2E (`category/[category]/page.tsx` 구현 후)
 
 > 사용 도구: `mcp__playwright__browser_navigate`, `mcp__playwright__browser_snapshot`, `mcp__playwright__browser_click`, `mcp__playwright__browser_evaluate`
 
-- [ ] **시나리오 1**: 해당 카테고리 글만 표시 → badge 텍스트 전수 검증
+- [x] **시나리오 1**: 해당 카테고리 글만 표시 → badge 텍스트 전수 검증
   - `browser_navigate` → `http://localhost:3000/category/[실제_카테고리명]`
   - `browser_evaluate` → 모든 카테고리 badge 텍스트를 배열로 수집 후 현재 카테고리와 불일치 항목 없음 확인
-- [ ] **시나리오 2**: 카테고리 탭 클릭 → URL 변경 및 헤더 텍스트 변경
+- [x] **시나리오 2**: 카테고리 탭 클릭 → URL 변경 및 헤더 텍스트 변경
   - `browser_click` → 다른 카테고리 탭
   - `browser_snapshot` → URL과 페이지 헤더 텍스트가 선택한 카테고리명으로 변경 확인
-- [ ] **시나리오 3**: 빈 카테고리 빈 상태 UI 확인
+- [x] **시나리오 3**: 빈 카테고리 빈 상태 UI 확인
   - `browser_navigate` → 글이 없는 카테고리 경로 (또는 테스트용 빈 카테고리)
   - `browser_snapshot` → 빈 상태 메시지 요소 존재 확인
 
@@ -361,12 +361,12 @@ Phase 5     최적화 및 배포                            13~14일차
 
 > 사용 도구: `mcp__playwright__browser_navigate`, `mcp__playwright__browser_click`, `mcp__playwright__browser_snapshot`, `mcp__playwright__browser_evaluate`
 
-- [ ] **시나리오 1**: 탭 클릭 → URL `?category=` 파라미터 반영 + 카드 필터링
+- [x] **시나리오 1**: 탭 클릭 → URL `?category=` 파라미터 반영 + 카드 필터링
   - `browser_navigate` → `http://localhost:3000/blog`
   - `browser_click` → 특정 카테고리 탭
   - `browser_evaluate` → `window.location.search`에 `?category=` 파라미터 포함 확인
   - `browser_evaluate` → 카드 badge가 모두 선택한 카테고리와 일치 확인
-- [ ] **시나리오 2**: '전체' 탭 → 쿼리 파라미터 제거 + 전체 목록 복원
+- [x] **시나리오 2**: '전체' 탭 → 쿼리 파라미터 제거 + 전체 목록 복원
   - `browser_click` → '전체' 탭
   - `browser_evaluate` → `window.location.search`가 빈 문자열이거나 `category` 파라미터 미포함 확인
   - `browser_snapshot` → 전체 글 카드 목록 복원 확인
@@ -375,12 +375,12 @@ Phase 5     최적화 및 배포                            13~14일차
 
 > 사용 도구: `mcp__playwright__browser_navigate`, `mcp__playwright__browser_type`, `mcp__playwright__browser_snapshot`, `mcp__playwright__browser_evaluate`, `mcp__playwright__browser_wait_for`
 
-- [ ] **시나리오 1**: 검색어 입력 → 300ms 후 제목 기준 필터링
+- [x] **시나리오 1**: 검색어 입력 → 300ms 후 제목 기준 필터링
   - `browser_navigate` → `http://localhost:3000/blog`
   - `browser_type` → 검색 입력창에 실제 글 제목 일부 입력
   - `browser_wait_for` → 300ms debounce 대기
   - `browser_snapshot` → 입력어가 포함된 글 카드만 표시 확인
-- [ ] **시나리오 2**: 결과 없음 → 빈 상태 UI
+- [x] **시나리오 2**: 결과 없음 → 빈 상태 UI
   - `browser_type` → 검색 입력창에 존재하지 않는 문자열 입력 (예: `xyzzy-no-match-9999`)
   - `browser_wait_for` → 300ms 대기
   - `browser_snapshot` → 빈 상태 메시지 요소 존재 확인, 글 카드 0개 확인
@@ -392,20 +392,20 @@ Phase 5     최적화 및 배포                            13~14일차
 
 > 사용 도구: `mcp__playwright__browser_navigate`, `mcp__playwright__browser_evaluate`
 
-- [ ] **시나리오 1**: 홈 페이지 title, description 메타 태그 존재 확인
+- [x] **시나리오 1**: 홈 페이지 title, description 메타 태그 존재 확인
   - `browser_navigate` → `http://localhost:3000`
   - `browser_evaluate` → `document.title`과 `document.querySelector('meta[name="description"]')?.content` 값 확인
-- [ ] **시나리오 2**: 블로그 목록 페이지 title, description 메타 태그 존재 확인
+- [x] **시나리오 2**: 블로그 목록 페이지 title, description 메타 태그 존재 확인
   - `browser_navigate` → `http://localhost:3000/blog`
   - `browser_evaluate` → title과 description 메타 태그 값 확인
-- [ ] **시나리오 3**: 글 상세 페이지 title(글 제목), description(첫 단락), og:image 확인
+- [x] **시나리오 3**: 글 상세 페이지 title(글 제목), description(첫 단락), og:image 확인
   - `browser_navigate` → `http://localhost:3000/blog/[실제_slug]`
   - `browser_evaluate` → `document.title`이 글 제목 포함 확인
   - `browser_evaluate` → `document.querySelector('meta[name="description"]')?.content` 값 존재 확인
   - `browser_evaluate` → `document.querySelector('meta[property="og:image"]')?.content` 값 존재 확인
-- [ ] **시나리오 4**: `og:image`에 Notion 내부 URL 미포함 검증 — [PRD M-03]
+- [x] **시나리오 4**: `og:image`에 Notion 내부 URL 미포함 검증 — [PRD M-03]
   - `browser_evaluate` → `og:image` content 값에 `prod-files-secure` 또는 `amazonaws.com` 문자열 미포함 확인
-- [ ] **시나리오 5**: 카테고리 페이지 title에 카테고리명 포함 확인
+- [x] **시나리오 5**: 카테고리 페이지 title에 카테고리명 포함 확인
   - `browser_navigate` → `http://localhost:3000/category/[실제_카테고리명]`
   - `browser_evaluate` → `document.title`에 해당 카테고리명 문자열 포함 확인
 
@@ -504,12 +504,12 @@ Phase 5     최적화 및 배포                            13~14일차
 |---------|--------|-------|------|
 | **F001** | 글 목록 조회 (Status=발행됨 필터, 페이지네이션) | Phase 2, 3 | ☑ 완료 |
 | **F002** | 글 상세 조회 (2단계 API, 중첩 블록 재귀, 블록 렌더러) | Phase 2, 3 | ☑ 완료 |
-| **F003** | 카테고리별 필터링 | Phase 4 | ☐ |
-| **F004** | 검색 기능 (제목 기반, debounce 300ms) | Phase 4 | ☐ |
+| **F003** | 카테고리별 필터링 | Phase 4 | ☑ 완료 |
+| **F004** | 검색 기능 (제목 기반, debounce 300ms) | Phase 4 | ☑ 완료 |
 | **F005** | 반응형 디자인 (375px~) | Phase 3, 5 | ☑ (Phase 3 완료, Phase 5 최종 점검 미완) |
 | **F006** | 다크모드 지원 (next-themes 재사용) | Phase 3, 5 | ☑ (기존 컴포넌트 재사용, Phase 5 최종 점검 미완) |
 | **F007** | ISR 캐싱 (revalidate 60초, Rate Limit 재시도) | Phase 2, 3 | ☑ 완료 |
-| **F008** | SEO 메타데이터 (generateMetadata, OG 이미지 정책) | Phase 4 | ☐ |
+| **F008** | SEO 메타데이터 (generateMetadata, OG 이미지 정책) | Phase 4 | ☑ 완료 |
 
 ---
 
@@ -519,8 +519,8 @@ Phase 5     최적화 및 배포                            13~14일차
 |---------|------|------|-----------|------|
 | M-01 | Major | F002: 2단계 API 호출 구조 (pages API + blocks API 분리) | Phase 2, 3 | ☑ 완료 |
 | M-02 | Major | F002: 중첩 블록 재귀 처리 및 블록 페이지네이션 구현 | Phase 2, 3 | ☑ 완료 |
-| M-03 | Major | F008: Notion 내부 이미지 URL 직접 사용 금지, 외부 URL 정책 | Phase 1, 3, 4 | ☑ (Phase 3 image 분기 처리 완료, Phase 4 OG 이미지 정책 미완) |
-| m-01 | Minor | F004: 클라이언트 검색 전체 로드(`page_size: 100`) 전략 | Phase 4 | ☐ |
+| M-03 | Major | F008: Notion 내부 이미지 URL 직접 사용 금지, 외부 URL 정책 | Phase 1, 3, 4 | ☑ 완료 (Phase 3 image 분기 처리 + Phase 4 OG 이미지 외부 URL 정책 적용) |
+| m-01 | Minor | F004: 클라이언트 검색 전체 로드(`page_size: 100`) 전략 | Phase 4 | ☑ 완료 |
 | m-02 | Minor | F007: `withRetry()` Rate Limit(초당 3회, 최대 3회 재시도) 구현 | Phase 2 | ☑ 완료 |
 | m-03 | Minor | F001·F003: `has_more`/`next_cursor` 페이지네이션 처리 | Phase 2 | ☑ 완료 |
 | m-04 | Minor | 전반: Notion DB `Slug` (rich_text) 필드 추가, 폴백 로직 구현 | Phase 1, 2 | ☑ (폴백 로직 완료, Notion DB 필드 추가는 수동 작업) |
