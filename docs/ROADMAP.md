@@ -524,3 +524,41 @@ Phase 5     최적화 및 배포                            13~14일차
 | m-02 | Minor | F007: `withRetry()` Rate Limit(초당 3회, 최대 3회 재시도) 구현 | Phase 2 | ☑ 완료 |
 | m-03 | Minor | F001·F003: `has_more`/`next_cursor` 페이지네이션 처리 | Phase 2 | ☑ 완료 |
 | m-04 | Minor | 전반: Notion DB `Slug` (rich_text) 필드 추가, 폴백 로직 구현 | Phase 1, 2 | ☑ (폴백 로직 완료, Notion DB 필드 추가는 수동 작업) |
+
+---
+
+## Phase 6: On-Demand ISR (즉시 재검증)
+
+> **목표**: Notion 글 발행/수정 시 60초를 기다리지 않고 외부 HTTP 요청으로 Next.js 캐시를 즉시 무효화한다. 기존 `revalidate = 60` ISR을 보완하는 기능이다.
+
+**구현 기능**: F007 (ISR 개선)
+
+### 세부 작업
+
+- [x] `.env.example`에 `REVALIDATE_SECRET` 환경변수 추가
+  ```bash
+  # On-Demand ISR 인증 토큰 (임의의 강력한 문자열)
+  REVALIDATE_SECRET=your_revalidate_secret_token
+  ```
+- [x] `app/api/revalidate/route.ts` 구현
+  - `Authorization: Bearer <REVALIDATE_SECRET>` 헤더 인증
+  - `{ slug }` body: 특정 글 상세 페이지만 재검증
+  - `{ path }` body: 특정 경로만 재검증
+  - body 없음: `/`, `/blog`, `/blog/[slug]`, `/category/[category]` 전체 재검증
+  - `REVALIDATE_SECRET` 미설정 시 500, 토큰 불일치 시 401 반환
+- [x] `README.md` On-Demand ISR 사용 가이드 추가 (curl 예시 포함)
+
+### 완료 기준 (DoD)
+
+- `POST /api/revalidate` 요청으로 캐시 즉시 무효화 확인
+- 인증 토큰 불일치 시 401 응답 확인
+- `REVALIDATE_SECRET` 미설정 시 500 응답 확인
+- `npm run lint` 오류 없음
+
+### 주요 파일/디렉토리
+
+| 파일 | 용도 |
+|------|------|
+| `app/api/revalidate/route.ts` | On-Demand ISR API Route Handler |
+| `.env.example` | `REVALIDATE_SECRET` 환경변수 템플릿 |
+| `README.md` | On-Demand ISR 사용 가이드 |
